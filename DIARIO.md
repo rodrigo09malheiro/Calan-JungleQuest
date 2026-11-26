@@ -40,3 +40,28 @@
 - Ferramenta: Claude (Anthropic).
 - Finalidade: geração do código desta sessão (gerador, orçamento, inimigos, HUD, sons) e depuração do erro acima.
 - O que alterei/validei: <preencher: o que testaste, mudaste e percebeste>.
+
+## Sessão 3 — 26 de novembro de 2026
+**Objetivo:** substituir os retângulos das salas por cenário a sério.
+
+**Atividades realizadas:**
+- Escolhi tiles do pack *Pixel Crawler - Free Pack* (Anokolisa): relva, tijolo, muros de terra e de pedra, rochas, porta e plantas.
+- Script `ferramentas/montar_tileset.py` que copia esses tiles para uma única folha `assets/cenario/tiles.png` (16x16), carregada com `this.load.spritesheet('tiles', ...)`.
+- `GameScene.desenharSala()` passou a usar imagens do tileset: a parede de cima mostra a face do muro com relva, as outras o topo; as pedras são rochas; há plantas decorativas pelo chão.
+- Cada nível tem o seu cenário em `config.js` (nível 1: relva e terra; nível 2: tijolo e pedra).
+- As variações de cada sala vêm de um gerador com semente própria da sala, por isso a mesma sala tem sempre o mesmo aspeto.
+- Mudei o projeto da subpasta para a raiz do repositório.
+
+**Problemas:**
+- Alguns tiles de relva eram mais escuros e o chão parecia um xadrez.
+
+**Solução:**
+- Fiquei só com os tiles de relva da mesma tonalidade.
+
+**Decisões:**
+- Mantive a grelha de colisões igual (1 tile = 1 bloco); só mudou o desenho.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic).
+- Finalidade: escolha dos tiles, script de montagem do tileset e alteração do desenho das salas.
+- O que alterei/validei: <preencher>.

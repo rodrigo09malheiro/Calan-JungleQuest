@@ -35,7 +35,7 @@ export const INIMIGOS = {
   olho:  { vida: 3, pontos: 150, custo: 3 },
 };
 
-// Definição dos níveis. Cada nível muda o tamanho do mapa, o orçamento, os inimigos e as cores.
+// Definição dos níveis. Cada nível muda o tamanho do mapa, o orçamento, os inimigos e o cenário.
 export const NIVEIS = [
   {
     nome: 'Selva em ruínas',
@@ -46,7 +46,8 @@ export const NIVEIS = [
     catalogo: [{ tipo: 'slime', peso: 4 }, { tipo: 'olho', peso: 1 }],
     obstaculos: [3, 6],             // mínimo e máximo de pedras por sala
     velocidade: 1,                  // multiplicador da velocidade dos inimigos
-    cores: { chao: [0x2e4d36, 0x335a3d], parede: 0x3b4a5a, borda: 0x222c36, pedra: 0x6b6f5a, pedraBorda: 0x3f4234 },
+    // Cenário: frames de assets/cenario/tiles.png (ver TILES abaixo).
+    cenario: { chao: 'relva', muro: 'muro_terra', base: 'base_terra', rochas: [48, 49], plantas: 0.07 },
   },
   {
     nome: 'Cavernas e criptas',
@@ -56,8 +57,22 @@ export const NIVEIS = [
     catalogo: [{ tipo: 'slime', peso: 2 }, { tipo: 'olho', peso: 2 }],
     obstaculos: [4, 8],
     velocidade: 1.2,
-    cores: { chao: [0x2f2a3a, 0x352f42], parede: 0x4a3f5c, borda: 0x231d2e, pedra: 0x5c5470, pedraBorda: 0x2c2638 },
+    cenario: { chao: 'tijolo', muro: 'muro_pedra', base: 'base_pedra', rochas: [50, 51], plantas: 0.02 },
   },
 ];
 
 export const MAX_INIMIGOS_SALA = 6;
+
+// Tileset do cenário (assets/cenario/tiles.png, montado por ferramentas/montar_tileset.py
+// a partir do pack Pixel Crawler). Cada linha da folha tem 8 tiles de 16x16.
+// Para cada tipo: o primeiro frame e quantas variações há.
+export const TILES = {
+  relva:      { inicio: 0, n: 8 },
+  tijolo:     { inicio: 8, n: 8 },
+  muro_terra: { inicio: 16, n: 8 },
+  base_terra: { inicio: 24, n: 8 },   // parede vista de frente, com relva na base
+  muro_pedra: { inicio: 32, n: 8 },
+  base_pedra: { inicio: 40, n: 8 },
+  porta:      { inicio: 56, n: 1 },
+  planta:     { inicio: 64, n: 8 },
+};

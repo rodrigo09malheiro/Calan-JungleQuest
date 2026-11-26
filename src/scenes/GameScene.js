@@ -1,4 +1,5 @@
-import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN } from '../config.js';
+import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES } from '../config.js';
+import Aleatorio from '../sistemas/Aleatorio.js';
 import Calan from '../entities/Calan.js';
 import Slime from '../entities/Slime.js';
 import Olho from '../entities/Olho.js';
@@ -76,8 +77,14 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // ---------- Sala ----------
+  // Desenha a sala com os tiles do cenário (assets/cenario/tiles.png).
+  // As variações (que tile de relva, que rocha, onde há plantas) vêm de um gerador
+  // com semente própria da sala: a mesma sala tem sempre o mesmo aspeto.
   desenharSala() {
-    const c = this.cfg.cores;
+    const cen = this.cfg.cenario;
+    const rng = new Aleatorio(this.partida.semente * 97 + this.partida.nivel * 1009 + this.sala.id);
+    const variacao = (tipo) => TILES[tipo].inicio + rng.inteiro(0, TILES[tipo].n - 1);
+
     this.paredes = this.physics.add.staticGroup();
     const g = this.sala.grelha;
 
@@ -87,16 +94,19 @@ export default class GameScene extends Phaser.Scene {
         const y = ty * TILE + TILE / 2;
         const t = g[ty][tx];
         if (t === 1) {
-          const parede = this.add.rectangle(x, y, TILE, TILE, c.parede).setStrokeStyle(1, c.borda);
-          this.paredes.add(parede);   // cria um corpo estático para a colisão
-        } else {
-          // Chão com um padrão de xadrez suave.
-          this.add.rectangle(x, y, TILE, TILE, c.chao[(tx + ty) % 2]).setDepth(-1000);
-          if (t === 2) {
-            const pedra = this.add.rectangle(x, y, TILE, TILE, c.pedra).setStrokeStyle(1, c.pedraBorda);
-            pedra.setDepth(y + TILE / 2);   // ordem de desenho pela base da pedra
-            this.paredes.add(pedra);
-          }
+          // Parede: a de cima mostra a face do muro (vista de frente), as outras o topo.
+          const frame = variacao(ty === 0 ? cen.base : cen.muro);
+          this.paredes.create(x, y, 'tiles', frame);   // cria a imagem e o corpo estático
+          continue;
+        }
+        this.add.image(x, y, 'tiles', variacao(cen.chao)).setDepth(-1000);
+        if (t === 2) {
+          // Pedra: uma rocha do nível, ordenada pela base (o Calan pode passar "por trás").
+          const pedra = this.paredes.create(x, y, 'tiles', rng.escolher(cen.rochas));
+          pedra.setDepth(y + TILE / 2);
+        } else if (rng.chance(cen.plantas)) {
+          // Decoração sem colisão: ervas e flores pelo chão.
+          this.add.image(x, y, 'tiles', variacao('planta')).setDepth(-900);
         }
       }
     }
@@ -109,7 +119,7 @@ export default class GameScene extends Phaser.Scene {
       for (const [tx, ty] of tiles) {
         const x = tx * TILE + TILE / 2, y = ty * TILE + TILE / 2;
         if (!this.sala.limpa) {
-          this.portasFechadas.add(this.add.rectangle(x, y, TILE, TILE, 0x7a4a2a).setStrokeStyle(1, 0x3a220f));
+          this.portasFechadas.create(x, y, 'tiles', TILES.porta.inicio);
         }
         // Zona invisível no vão da porta: ao pisá-la, o Calan passa para a sala vizinha.
         const zona = this.add.zone(x, y, TILE, TILE);

@@ -14,6 +14,8 @@ export default class BootScene extends Phaser.Scene {
     this.load.spritesheet('slime', 'assets/slime.png', { frameWidth: 30, frameHeight: 24 });
     // Olho: 0 e 1 a flutuar, 2 a carregar o tiro, 3 atordoado.
     this.load.spritesheet('olho', 'assets/olho_chamas.png', { frameWidth: 34, frameHeight: 34 });
+    // Cenário: tileset montado a partir do pack Pixel Crawler (ver CREDITS.md).
+    this.load.spritesheet('tiles', 'assets/cenario/tiles.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('boss', 'assets/boss.png', { frameWidth: 64, frameHeight: 64 });
 
     for (const nome of LISTA_SONS) this.load.audio(nome, `assets/sons/${nome}.wav`);
