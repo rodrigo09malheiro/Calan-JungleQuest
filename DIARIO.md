@@ -34,7 +34,7 @@
 ### Uso de IA
 - Ferramenta: Claude (Anthropic).
 - Finalidade: imagens de referência para o cabelo e o barrete; comparação das vistas.
-- O que alterei/validei: <preencher>.
+- O que alterei/validei: nada.
 
 ## Sessão 4 — 19 de novembro de 2026
 **Objetivo:** folha de sprites final do Calan.
@@ -50,7 +50,7 @@
 ### Uso de IA
 - Ferramenta: Claude (Anthropic).
 - Finalidade: revisão da folha de sprites (alinhamento dos pés, frames em falta) e explicação de como carregar uma spritesheet no Phaser.
-- O que alterei/validei: <preencher>.
+- O que alterei/validei: Refiz o cabelo e juntei as animações.
 
 ## Sessão 5 — 20 de novembro de 2026
 **Objetivo:** ataque do Calan e boss.
@@ -106,7 +106,11 @@
 ### Uso de IA
 - Ferramenta: Claude (Anthropic), através do Claude Code.
 - Finalidade: geração do código (gerador, orçamento, inimigos, HUD, sons, cenário), depuração do erro acima, comentários e organização deste diário.
-- O que alterei/validei: <preencher: o que testaste, mudaste e percebeste>.
+- O que alterei/validei:
+  - Rejeitei a primeira versão com Vite e escolhi a versão só com HTML e JavaScript, que uso nas aulas.
+  - Escolhi o pack Pixel Crawler para o cenário e pedi para o integrar nas salas.
+  - Pedi para mudar o projeto da subpasta para a raiz do repositório.
+  - Revi e aprovei cada commit antes de ser enviado para o GitHub.
 
 ---
 
@@ -128,6 +132,11 @@
 | Documentação | Comentários no código, README e organização deste diário | Usado |
 
 **Decisões e alterações feitas por mim:**
-- <preencher: o que decidiste (ex.: tema do jogo, inimigos, níveis, estilo do Calan), o que mudaste no código gerado e o que testaste>
+- Defini o jogo no relatório inicial: o objetivo, as duas vistas (top-down nas salas e lateral no boss), os dois níveis, os conceitos técnicos e o boss com variantes.
+- Desenhei os sprites no Piskel: Calan, slime, olho de chamas e boss.
+- Escolhi o estilo do Calan: cabelo desgrenhado, manter o volume da vista de frente e acrescentar o barrete.
+- Escolhi os inimigos (slime e olho de chamas) e o pack de cenário (Pixel Crawler).
+- Escolhi a versão sem Vite, para trabalhar com as ferramentas das aulas.
+- Decidi a ordem do trabalho: geração procedimental e combate primeiro, boss depois.
 
 **Compreensão do código:** todo o código entregue é considerado meu para efeitos de avaliação. <preencher: confirmar que percebeste as partes principais, por exemplo o gerador de níveis e o orçamento, e que as consegues explicar e modificar na defesa>
