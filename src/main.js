@@ -21,6 +21,8 @@ const config = {
     mode: Phaser.Scale.FIT,             // ajusta à janela
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
+  // Ordem das cenas: a primeira (Boot) arranca sozinha; as outras são abertas pelo código.
+  // O HUD corre por cima da GameScene ao mesmo tempo (scene.launch).
   scene: [BootScene, MenuScene, GameScene, HUDScene, GameOverScene],
 };
 

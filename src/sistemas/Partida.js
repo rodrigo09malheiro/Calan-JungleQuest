@@ -23,10 +23,12 @@ export default class Partida {
     return Math.floor(Math.random() * 1_000_000);
   }
 
+  // Atalhos: configuração do nível atual, sala onde o Calan está e se é o último nível.
   get cfg() { return NIVEIS[this.nivel]; }
   get sala() { return this.mapa.salas[this.salaAtual]; }
   get ultimoNivel() { return this.nivel === NIVEIS.length - 1; }
 
+  // Gera o mapa do nível n e põe o Calan na sala de entrada.
   iniciarNivel(n) {
     this.nivel = n;
     // Cada nível tem o seu próprio gerador, derivado da semente da partida,
@@ -38,6 +40,7 @@ export default class Partida {
     this.metricas.iniciarNivel(n);
   }
 
+  // Toda a pontuação passa por aqui (inimigos, tesouros, bónus de sala e de nível).
   somarPontos(p) {
     this.pontuacao += p;
   }

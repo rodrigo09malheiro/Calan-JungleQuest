@@ -14,6 +14,7 @@ export default class Inimigo extends Phaser.Physics.Arcade.Sprite {
     this.pontos = INIMIGOS[tipo].pontos;
     this.multVel = multVelocidade;
     this.atordoadoAte = 0;   // durante o recuo não se mexe por conta própria
+    this.recuando = false;   // true enquanto está a ser empurrado por um golpe
     this.morto = false;
   }
 
@@ -34,6 +35,7 @@ export default class Inimigo extends Phaser.Physics.Arcade.Sprite {
     return { dx, dy, dist: Math.hypot(dx, dy) };
   }
 
+  // Recebe dano vindo do ponto (origemX, origemY), normalmente o Calan.
   levarDano(dano, origemX, origemY) {
     if (this.morto) return;
     this.vida -= dano;
@@ -50,6 +52,8 @@ export default class Inimigo extends Phaser.Physics.Arcade.Sprite {
     if (this.vida <= 0) this.morrer();
   }
 
+  // Desliga o corpo físico (já não magoa nem é atingido), avisa a cena
+  // (pontos, sala limpa) e remove o sprite depois da animação.
   morrer() {
     this.morto = true;
     this.body.enable = false;

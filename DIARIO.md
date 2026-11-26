@@ -1,13 +1,28 @@
 # Diário de desenvolvimento
 
-## Sessão 1 — projeto base
-- Criado o projeto Vite + Phaser 4 e a estrutura de pastas.
-- Cenas Boot, Menu, Game e GameOver; Calan a andar nas 4 direções numa sala de teste, com colisões Arcade.
+## Sessão 1 — 18 a 24 de novembro de 2026
+**Objetivo:** sprites do Calan e projeto base.
 
-### Uso de IA (obrigatório declarar)
+**Atividades realizadas:**
+- Desenhei no Piskel os sprites do Calan, do slime, do olho com chamas e do boss.
+- Ajustei o cabelo do Calan (estilo mais desgrenhado nas vistas de frente, lado e costas) e acrescentei um barrete numa camada à parte.
+- Organizei o Calan numa folha 4x4 de células 34x34 (parado, andar 1, andar 2 e ataque, em frente, lado e costas).
+- Criei o projeto Phaser 4 só com HTML e JavaScript (sem ferramentas de build), com o Phaser numa cópia local em `lib/`.
+- Cenas Boot, Menu, Game e GameOver; o Calan anda nas 4 direções numa sala de teste, com colisões Arcade.
+
+**Problemas:**
+- A primeira versão usava o Vite, que eu não conhecia das aulas.
+
+**Solução:**
+- Passei para uma versão simples, só com HTML e módulos JavaScript, servida com `python -m http.server`.
+
+**Decisões:**
+- Origem dos sprites nos pés (`setOrigin(0.5, 1)`) e hitbox pequena junto aos pés, para a vista de cima.
+- O lado esquerdo é o lado direito espelhado (`setFlipX`), para não desenhar mais frames.
+
+### Uso de IA
 - Ferramenta: Claude (Anthropic).
-- Finalidade: ajuda com os sprites (referências, pixel art, descrição de frames) e geração do esqueleto inicial do código.
-- O que usei: o esqueleto do projeto e a classe do Calan.
+- Finalidade: imagens de referência para o cabelo e o barrete, comentários sobre a folha de sprites, esqueleto inicial do código (cenas e classe do Calan).
 - O que alterei/validei: <preencher: o que mudaste, testaste e percebeste>.
 
 ## Sessão 2 — 26 de novembro de 2026
@@ -65,3 +80,39 @@
 - Ferramenta: Claude (Anthropic).
 - Finalidade: escolha dos tiles, script de montagem do tileset e alteração do desenho das salas.
 - O que alterei/validei: <preencher>.
+
+## Sessão 4 — 26 de novembro de 2026
+**Objetivo:** rever o código e preparar a declaração de IA.
+
+**Atividades realizadas:**
+- Comentei o código todo: cenas, entidades, sistemas e os scripts em `ferramentas/`.
+- Juntei a declaração de utilização de IA no fim deste diário.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic).
+- Finalidade: comentários no código e organização deste diário.
+- O que alterei/validei: <preencher>.
+
+---
+
+# Declaração de utilização de IA
+
+**Ferramenta:** Claude (Anthropic), através do Claude Code e do chat.
+
+| Parte do trabalho | O que a IA fez | O que foi usado no jogo |
+|---|---|---|
+| Sprites | Imagens de referência para o cabelo e o barrete do Calan; análise da folha de sprites (alinhamento, frames em falta) | Sprites desenhados por mim no Piskel, com base nessas referências |
+| Estrutura do projeto | Esqueleto das cenas (Boot, Menu, Game, GameOver) e da classe `Calan` | Usado e depois alterado nas sessões seguintes |
+| Geração procedimental (conceito 1) | Código de `Aleatorio.js` e `GeradorNivel.js` (mapa, BFS, flood fill) | Usado |
+| Orçamento de dificuldade (conceito 2) | Código de `Orcamento.js` e das métricas em `Metricas.js` | Usado |
+| Combate e inimigos | Ataque do Calan, `Inimigo`, `Slime`, `Olho`, bolas de fogo | Usado |
+| Interface | `HUDScene`, ecrã de resultados, recordes em `localStorage` | Usado |
+| Som | Script `ferramentas/gerar_sons.py`, que gera os efeitos em WAV | Usado |
+| Cenário | Escolha dos tiles do pack Pixel Crawler e script `ferramentas/montar_tileset.py` | Usado (o pack está creditado em `CREDITS.md`) |
+| Depuração | Diagnóstico do jogo a congelar ao mudar de sala (grupos reutilizados no `scene.restart()`) | Correção aplicada |
+| Documentação | Comentários no código, README e organização deste diário | Usado |
+
+**Decisões e alterações feitas por mim:**
+- <preencher: o que decidiste (ex.: tema do jogo, inimigos, níveis, estilo do Calan), o que mudaste no código gerado e o que testaste>
+
+**Compreensão do código:** todo o código entregue é considerado meu para efeitos de avaliação. <preencher: confirmar que percebeste as partes principais, por exemplo o gerador de níveis e o orçamento, e que as consegues explicar e modificar na defesa>

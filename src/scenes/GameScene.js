@@ -130,6 +130,8 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  // Cria os inimigos da sala a partir da lista gerada pelo GeradorNivel (tipo e tile).
+  // Se a sala já foi limpa numa visita anterior, não aparece ninguém.
   criarInimigos() {
     // Atenção: no restart o Phaser reutiliza o MESMO objeto da cena, por isso todos os
     // grupos e objetos têm de ser criados de novo aqui (senão ficam os da sala anterior).
@@ -140,6 +142,7 @@ export default class GameScene extends Phaser.Scene {
     if (this.sala.limpa) return;
     for (const def of this.sala.inimigos) {
       const Classe = CLASSES_INIMIGO[def.tipo];
+      // Posição em píxeis: centro do tile em x, fundo do tile em y (origem nos pés).
       const x = def.tx * TILE + TILE / 2, y = def.ty * TILE + TILE;
       const inimigo = new Classe(this, x, y, this.cfg.velocidade);
       this.inimigos.add(inimigo);
@@ -151,6 +154,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.sala.limpa) this.mostrarRecompensas(false);
   }
 
+  // Mostra o baú e/ou a escada. comEfeito = true quando a sala acaba de ser limpa
+  // (aparecem com um fade); false quando o Calan volta a uma sala já limpa.
   mostrarRecompensas(comEfeito) {
     if (this.sala.tipo === 'tesouro' && !this.sala.tesouroApanhado) {
       this.bau = this.physics.add.staticImage(CENTRO_X, CENTRO_Y - 4, 'bau').setDepth(CENTRO_Y);
@@ -165,11 +170,15 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  // Fade-in simples: o objeto passa de invisível a visível em 400 ms.
   aparecer(obj) {
     obj.setAlpha(0);
     this.tweens.add({ targets: obj, alpha: 1, duration: 400 });
   }
 
+  // Colisões e sobreposições (Arcade Physics):
+  //  - collider: os corpos batem e não se atravessam (paredes, pedras, portas fechadas);
+  //  - overlap: os corpos podem sobrepor-se e chama-se uma função (dano, mudar de sala).
   criarColisoes() {
     this.physics.add.collider(this.calan, this.paredes);
     this.physics.add.collider(this.calan, this.portasFechadas);
@@ -179,20 +188,24 @@ export default class GameScene extends Phaser.Scene {
     // Proteção extra: os inimigos nunca passam pelos vãos das portas.
     for (const zona of this.zonasPorta) this.physics.add.collider(this.inimigos, zona);
 
+    // Tocar num inimigo ou numa bola de fogo tira vida ao Calan.
     this.physics.add.overlap(this.calan, this.inimigos, (calan, inimigo) => this.calanAtingido(inimigo.x, inimigo.y), null, this);
     this.physics.add.overlap(this.calan, this.projeteis, (calan, bola) => {
       this.calanAtingido(bola.x, bola.y);
       bola.destroy();
     }, null, this);
+    // As bolas de fogo desaparecem ao bater numa parede ou porta.
     this.physics.add.collider(this.projeteis, this.paredes, (bola) => bola.destroy());
     this.physics.add.collider(this.projeteis, this.portasFechadas, (bola) => bola.destroy());
 
+    // Pisar o vão de uma porta aberta leva à sala vizinha.
     for (const zona of this.zonasPorta) {
       this.physics.add.overlap(this.calan, zona, () => this.mudarSala(zona.direcao), null, this);
     }
   }
 
   // ---------- Combate ----------
+  // Chamado pelo evento 'calan-ataca' (emitido em Calan.atacar()).
   golpe(calan) {
     this.sons.tocar('golpe');
     const d = calan.vetorDirecao();
@@ -223,6 +236,7 @@ export default class GameScene extends Phaser.Scene {
     this.time.delayedCall(100, verificar);   // segunda verificação a meio do golpe
   }
 
+  // Chamado pelo evento 'olho-dispara': cria uma bola de fogo apontada ao Calan.
   disparar(olho) {
     if (!this.calan.active) return;
     this.sons.tocar('fogo');
@@ -231,9 +245,11 @@ export default class GameScene extends Phaser.Scene {
     bola.setDepth(2000);
     const v = new Phaser.Math.Vector2(this.calan.x - olho.x, this.calan.y - 8 - (olho.y - 10)).normalize().scale(90 * this.cfg.velocidade);
     bola.setVelocity(v.x, v.y);
-    this.time.delayedCall(3000, () => bola.destroy());
+    this.time.delayedCall(3000, () => bola.destroy());   // não fica a voar para sempre
   }
 
+  // O Calan levou dano vindo do ponto (ox, oy). Ignora se estiver invulnerável
+  // (pisca durante 1 s depois de cada golpe) ou se a cena estiver a mudar de sala.
   calanAtingido(ox, oy) {
     const agora = this.time.now;
     if (!this.calan.podeLevarDano(agora) || this.aMudar) return;
@@ -246,6 +262,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.partida.vida <= 0) this.fimDeJogo(false);
   }
 
+  // Chamado pelo evento 'inimigo-morto' (Inimigo.morrer()): pontos, métricas e,
+  // se era o último inimigo, a sala fica limpa.
   inimigoMorto(inimigo) {
     this.sons.tocar('inimigo_morre');
     this.partida.somarPontos(inimigo.pontos);
@@ -278,6 +296,7 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  // O Calan tocou no baú: +500 pontos, +1 coração e conta para as métricas (estilo cauteloso).
   abrirBau() {
     if (this.sala.tesouroApanhado) return;
     this.sala.tesouroApanhado = true;
@@ -291,6 +310,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // ---------- Mudança de sala e de nível ----------
+  // Passa para a sala vizinha na direção dir. Só funciona com a sala limpa.
+  // A cena é reiniciada e desenha a sala nova; o Calan aparece na porta oposta.
   mudarSala(dir) {
     if (!this.sala.limpa || this.aMudar) return;
     this.aMudar = true;
@@ -301,6 +322,8 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.once('camerafadeoutcomplete', () => this.scene.restart());
   }
 
+  // O Calan pisou a escada da sala de saída: passa ao nível seguinte (gerado de novo)
+  // ou, no último nível, termina a partida com vitória.
   descer() {
     if (this.aMudar) return;
     this.aMudar = true;
@@ -318,6 +341,7 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  // Fim da partida: pára a física, fecha o HUD e abre o ecrã de resultados.
   fimDeJogo(vitoria) {
     this.aMudar = true;
     this.physics.pause();
@@ -327,12 +351,14 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  // Texto pequeno que sobe e desaparece (ex.: "+100" quando um inimigo morre).
   textoFlutuante(x, y, texto, cor) {
     const t = this.add.text(x, y, texto, { fontFamily: 'monospace', fontSize: '8px', color: cor, stroke: '#000', strokeThickness: 2 })
       .setOrigin(0.5).setDepth(5000).setResolution(SCALE);
     this.tweens.add({ targets: t, y: y - 12, alpha: 0, duration: 900, delay: 300, onComplete: () => t.destroy() });
   }
 
+  // Ciclo de jogo: o Phaser chama update() a cada frame (~60 vezes por segundo).
   update(time) {
     this.calan.update(time);
     for (const inimigo of this.inimigos.getChildren()) inimigo.update(time, this.calan);
