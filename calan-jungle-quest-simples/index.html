@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calan: Jungle Quest</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0e0e14; }
+      #jogo { width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="jogo"></div>
+    <!-- O Phaser vem de uma cópia local (lib/), por isso o jogo funciona sem internet. -->
+    <script src="lib/phaser.min.js"></script>
+    <!-- type="module" permite usar import/export entre os ficheiros do jogo. -->
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
