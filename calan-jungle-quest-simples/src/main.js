@@ -2,6 +2,7 @@ import { ECRA_LARGURA, ECRA_ALTURA } from './config.js';
 import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import GameScene from './scenes/GameScene.js';
+import HUDScene from './scenes/HUDScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
 
 // Configuração principal do Phaser.
@@ -20,7 +21,8 @@ const config = {
     mode: Phaser.Scale.FIT,             // ajusta à janela
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MenuScene, GameScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, HUDScene, GameOverScene],
 };
 
-new Phaser.Game(config);
+// window.jogo permite inspecionar o jogo na consola do navegador (depuração).
+window.jogo = new Phaser.Game(config);
