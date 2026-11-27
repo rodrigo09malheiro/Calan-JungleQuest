@@ -5,6 +5,7 @@ import GameScene from './scenes/GameScene.js';
 import HUDScene from './scenes/HUDScene.js';
 import BossScene from './scenes/BossScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
+import ToqueScene from './scenes/ToqueScene.js';
 
 // Configuração principal do Phaser.
 const config = {
@@ -18,13 +19,16 @@ const config = {
     default: 'arcade',                  // física Arcade (exigida pelo enunciado)
     arcade: { gravity: { y: 0 }, debug: false },   // vista de cima: sem gravidade (a BossScene liga-a)
   },
+  // Até 3 dedos ao mesmo tempo no telemóvel (joystick + atacar + saltar).
+  input: { activePointers: 3 },
   scale: {
     mode: Phaser.Scale.FIT,             // ajusta à janela
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   // Ordem das cenas: a primeira (Boot) arranca sozinha; as outras são abertas pelo código.
-  // O HUD corre por cima da GameScene ao mesmo tempo (scene.launch).
-  scene: [BootScene, MenuScene, GameScene, BossScene, HUDScene, GameOverScene],
+  // O HUD corre por cima da GameScene ao mesmo tempo (scene.launch);
+  // no telemóvel, os comandos táteis (ToqueScene) ficam por cima do HUD.
+  scene: [BootScene, MenuScene, GameScene, BossScene, HUDScene, GameOverScene, ToqueScene],
 };
 
 // window.jogo permite inspecionar o jogo na consola do navegador (depuração).

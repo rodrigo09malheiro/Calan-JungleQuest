@@ -2,15 +2,30 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Sem zoom com dois dedos nem duplo toque: no telemóvel, os toques são para o jogo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Calan: Jungle Quest</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #0e0e14; }
-      #jogo { width: 100%; height: 100%; }
+      html, body { margin: 0; height: 100%; background: #0e0e14; overflow: hidden; }
+      /* touch-action: none impede o navegador de fazer scroll ou zoom quando se toca no jogo. */
+      #jogo { width: 100%; height: 100%; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      /* Aviso para rodar o telemóvel: só em ecrãs táteis e na vertical (no PC nunca aparece). */
+      #rodar { display: none; }
+      @media (pointer: coarse) and (orientation: portrait) {
+        #rodar {
+          display: flex; position: fixed; inset: 0; z-index: 10; align-items: center; justify-content: center;
+          flex-direction: column; gap: 16px; background: #0e0e14; color: #cfd8dc;
+          font: 20px sans-serif; text-align: center; padding: 24px;
+        }
+        #rodar .icone { font-size: 56px; color: #9fd8a8; }
+      }
     </style>
   </head>
   <body>
     <div id="jogo"></div>
+    <div id="rodar"><div class="icone">&#8635;</div><div>Roda o telemóvel para a horizontal para jogar.</div></div>
     <!-- O Phaser vem de uma cópia local (lib/), por isso o jogo funciona sem internet. -->
     <script src="lib/phaser.min.js"></script>
     <!-- type="module" permite usar import/export entre os ficheiros do jogo. -->

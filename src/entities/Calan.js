@@ -1,4 +1,5 @@
 import { VEL_CALAN, FRAME_CALAN, ALTURA_CALAN, PES_CALAN } from '../config.js';
+import Toque from '../sistemas/Toque.js';
 
 // Frames da folha do Calan para cada direção.
 const FRAME_PARADO = { baixo: 0, lado: 1, cima: 2 };
@@ -37,6 +38,8 @@ export default class Calan extends Phaser.Physics.Arcade.Sprite {
       w: 'W', s: 'S', a: 'A', d: 'D',
       atacar: 'SPACE', j: 'J',
     });
+    // No telemóvel, o joystick e o botão ATACAR (ToqueScene) fazem o mesmo.
+    Toque.limparPedidos();
   }
 
   update(time) {
@@ -49,7 +52,8 @@ export default class Calan extends Phaser.Physics.Arcade.Sprite {
     if (this.aAtacar) { this.setVelocity(0, 0); return; }
 
     const t = this.teclas;
-    if (Phaser.Input.Keyboard.JustDown(t.atacar) || Phaser.Input.Keyboard.JustDown(t.j)) {
+    const toqueAtacar = Toque.consumir('atacar');
+    if (Phaser.Input.Keyboard.JustDown(t.atacar) || Phaser.Input.Keyboard.JustDown(t.j) || toqueAtacar) {
       this.atacar();
       return;
     }
@@ -59,16 +63,22 @@ export default class Calan extends Phaser.Physics.Arcade.Sprite {
     const cima = t.cima.isDown || t.w.isDown;
     const baixo = t.baixo.isDown || t.s.isDown;
 
-    // -1, 0 ou 1 em cada eixo.
-    const vx = (dir ? 1 : 0) - (esq ? 1 : 0);
-    const vy = (baixo ? 1 : 0) - (cima ? 1 : 0);
+    // Teclado: -1, 0 ou 1 em cada eixo. Joystick (telemóvel): valores entre -1 e 1.
+    let vx = (dir ? 1 : 0) - (esq ? 1 : 0);
+    let vy = (baixo ? 1 : 0) - (cima ? 1 : 0);
+    if (vx === 0 && vy === 0 && (Toque.x !== 0 || Toque.y !== 0)) {
+      vx = Toque.x;
+      vy = Toque.y;
+    }
 
     // Na diagonal normaliza-se, para não andar mais depressa.
-    const v = new Phaser.Math.Vector2(vx, vy).normalize().scale(VEL_CALAN);
+    const v = new Phaser.Math.Vector2(vx, vy);
+    if (v.length() > 1) v.normalize();
+    v.scale(VEL_CALAN);
     this.setVelocity(v.x, v.y);
 
-    // Escolhe a direção a mostrar. O movimento horizontal tem prioridade.
-    if (vx !== 0) {
+    // Escolhe a direção a mostrar: o eixo com mais movimento; em empate (diagonal), o horizontal.
+    if (vx !== 0 && Math.abs(vx) >= Math.abs(vy)) {
       this.direcao = 'lado';
       this.olhaEsquerda = vx < 0;
       this.setFlipX(this.olhaEsquerda);   // o lado esquerdo é o direito espelhado

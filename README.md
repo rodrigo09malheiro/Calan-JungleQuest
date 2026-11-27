@@ -19,7 +19,7 @@ Com o servidor do Python, se mudares o código e o jogo continuar igual, recarre
 
 ## Estrutura
 - `index.html` — carrega o Phaser (`lib/phaser.min.js`) e o jogo (`src/main.js`)
-- `src/scenes/` — cenas (Boot, Menu, Game, Boss, HUD, GameOver)
+- `src/scenes/` — cenas (Boot, Menu, Game, Boss, HUD, GameOver e Toque, os comandos táteis)
 - `src/entities/` — Calan (salas), CalanLateral (boss), Inimigo, Slime, Olho e Boss
 - `src/config.js` — constantes (tile, escala, velocidades)
 - `assets/` — folhas de sprites, cenário (`cenario/`) e sons (`sons/`)
@@ -29,6 +29,18 @@ Com o servidor do Python, se mudares o código e o jogo continuar igual, recarre
 - Salas (vista de cima): setas ou WASD para andar, ESPAÇO ou J para atacar.
 - Boss (vista lateral): setas/A-D para andar, CIMA ou W para saltar, ESPAÇO ou J para atacar.
 - ESC volta ao menu.
+
+### Telemóvel / tablet
+Num ecrã tátil aparecem comandos por cima do jogo (no PC não aparecem):
+- Joystick: toca e arrasta na metade esquerda do ecrã para andar.
+- ATACAR: botão vermelho à direita.
+- SALTAR: botão azul, só na luta com o boss.
+- MENU: canto superior direito; toca duas vezes para sair.
+- No menu e no fim da partida, toca no ecrã ou nos botões. Joga-se com o telemóvel na horizontal.
+- Para testar os comandos no PC: `index.html?toque=1`.
+
+Para jogar no telemóvel com o XAMPP ou com o servidor do Python, o telemóvel tem de estar na mesma rede Wi-Fi:
+abre `http://<IP do computador>:8000` (o IP vê-se com `ipconfig` no Windows).
 
 ## Vida
 - O Calan tem 6 corações. Ao passar para o nível 2, a vida volta ao máximo.
@@ -59,4 +71,5 @@ Cada partida usa uma semente ao acaso, mostrada no HUD. Para repetir um mapa, ab
 - `src/sistemas/Orcamento.js` — inimigos por orçamento de dificuldade (conceito 2)
 - `src/sistemas/Metricas.js` — desempenho do jogador, variante e fator do boss (dificuldade adaptativa)
 - `src/sistemas/GeradorArena.js` — plataformas da arena do boss geradas com semente e verificadas
+- `src/sistemas/Toque.js` — deteta ecrãs táteis e guarda o estado do joystick e dos botões
 - `src/sistemas/Partida.js`, `Recordes.js`, `Sons.js`
