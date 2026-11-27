@@ -30,6 +30,11 @@ Com o servidor do Python, se mudares o código e o jogo continuar igual, recarre
 - Boss (vista lateral): setas/A-D para andar, CIMA ou W para saltar, ESPAÇO ou J para atacar.
 - ESC volta ao menu.
 
+## Baús
+- A sala do tesouro de cada nível tem um baú (+500 pontos e +1 coração; no nível 1 guarda também a espada).
+- Os outros becos sem saída têm 50% de probabilidade de esconder um baú extra: moedas (+200) ou, mais raramente, uma poção (+1 coração). Os valores estão em `BAUS_EXTRA`, no `src/config.js`.
+- No minimapa, um ponto amarelo marca um baú por abrir numa sala já limpa.
+
 ## Espada
 O Calan começa a lutar só com as mãos (golpe curto, 1 de dano). A espada está no baú da sala do
 tesouro do nível 1, que é opcional (fica num beco sem saída). Com a espada, o golpe tem mais

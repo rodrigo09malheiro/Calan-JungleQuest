@@ -2,17 +2,18 @@ import { INIMIGOS } from '../config.js';
 
 // Classe base dos inimigos: vida, dano recebido, recuo e morte.
 // As subclasses (Slime, Olho) só tratam do comportamento em pensar().
+// nivel = configuração do nível (NIVEIS em config.js): muda a velocidade e a vida.
 export default class Inimigo extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, textura, tipo, multVelocidade) {
+  constructor(scene, x, y, textura, tipo, nivel) {
     super(scene, x, y, textura, 0);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setOrigin(0.5, 1);   // origem nos pés, como o Calan
 
     this.tipo = tipo;
-    this.vida = INIMIGOS[tipo].vida;
+    this.vida = Math.ceil(INIMIGOS[tipo].vida * nivel.vidaInimigos);   // mais vida no nível 2
     this.pontos = INIMIGOS[tipo].pontos;
-    this.multVel = multVelocidade;
+    this.multVel = nivel.velocidade;
     this.atordoadoAte = 0;   // durante o recuo não se mexe por conta própria
     this.recuando = false;   // true enquanto está a ser empurrado por um golpe
     this.morto = false;

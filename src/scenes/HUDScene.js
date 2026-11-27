@@ -130,6 +130,8 @@ export default class HUDScene extends Phaser.Scene {
       if (s.visitada) {
         g.fillStyle(s.id === p.salaAtual ? 0xffffff : cor[s.tipo]).fillRect(x, y, W, H);
         if (!s.limpa) g.fillStyle(0xe0414f).fillRect(x + W / 2 - 2, y + H / 2 - 2, 4, 4);   // ainda tem inimigos
+        const bauPorAbrir = (s.tipo === 'tesouro' || s.bauExtra) && !s.tesouroApanhado;
+        if (s.limpa && bauPorAbrir) g.fillStyle(0xffd34d).fillRect(x + W / 2 - 2, y + H / 2 - 2, 4, 4);   // baú por abrir
       } else {
         g.lineStyle(1, 0x7f8c8d).strokeRect(x + 0.5, y + 0.5, W - 1, H - 1);
       }

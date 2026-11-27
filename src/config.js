@@ -61,6 +61,7 @@ export const NIVEIS = [
     catalogo: [{ tipo: 'slime', peso: 4 }, { tipo: 'olho', peso: 1 }],
     obstaculos: [3, 6],             // mínimo e máximo de pedras por sala
     velocidade: 1,                  // multiplicador da velocidade dos inimigos
+    vidaInimigos: 1,                // multiplicador da vida dos inimigos
     // Cenário: frames de assets/cenario/tiles.png (ver TILES abaixo).
     cenario: { chao: 'relva', muro: 'muro_terra', base: 'base_terra', rochas: [48, 49], plantas: 0.07 },
   },
@@ -72,11 +73,23 @@ export const NIVEIS = [
     catalogo: [{ tipo: 'slime', peso: 2 }, { tipo: 'olho', peso: 2 }],
     obstaculos: [4, 8],
     velocidade: 1.2,
+    vidaInimigos: 1.5,              // slime 2 -> 3, olho 3 -> 5 (arredonda para cima)
     cenario: { chao: 'tijolo', muro: 'muro_pedra', base: 'base_pedra', rochas: [50, 51], plantas: 0.02 },
   },
 ];
 
 export const MAX_INIMIGOS_SALA = 6;
+
+// Baús extra: cada beco sem saída (sala com uma só porta) que não seja a sala do tesouro
+// tem esta probabilidade de esconder um baú. O conteúdo é escolhido com pesos (seed).
+export const BAUS_EXTRA = {
+  chance: 0.5,
+  conteudos: {
+    moedas: { peso: 3, pontos: 200, icone: 0 },   // icone = frame de assets/cenario/itens.png
+    pocao:  { peso: 1, vida: 1, icone: 1 },
+  },
+};
+export const ICONE_MOEDA = 0;      // ícone mostrado pelo baú da sala do tesouro (pontos)
 
 // Tileset do cenário (assets/cenario/tiles.png, montado por ferramentas/montar_tileset.py
 // a partir do pack Pixel Crawler). Cada linha da folha tem 8 tiles de 16x16.

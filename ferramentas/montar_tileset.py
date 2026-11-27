@@ -1,6 +1,7 @@
 # Monta as folhas de cenário do jogo a partir do pack "Pixel Crawler - Free Pack" (Anokolisa):
 #   assets/cenario/tiles.png  -> salas em vista de cima (níveis 1 e 2)
 #   assets/cenario/cripta.png -> arena do boss em vista lateral
+#   assets/cenario/itens.png  -> ícones dos baús (moeda e poção)
 # Copia tiles de 16x16 das folhas originais para uma folha nova, uma categoria por linha
 # (8 tiles por linha). A ordem tem de bater com TILES e TILES_CRIPTA em src/config.js.
 #
@@ -19,6 +20,8 @@ FOLHAS = {
     'masm':  'Tilesets/Dungeon_Tiles.png',
     'pedra': 'Props/Static/Rocks.png',
     'veg':   'Props/Static/Vegetation.png',
+    'recur': 'Props/Static/Resources.png',
+    'esot':  'Props/Static/Esoteric.png',
 }
 
 # Cada linha: (nome, folha de origem, lista de (coluna, linha) em tiles de 16 px).
@@ -50,6 +53,9 @@ CRIPTA = [
     ('porta_arco',   'masm', [(0, 7), (1, 7), (0, 8), (1, 8), (0, 9), (1, 9)]),
 ]
 
+# Ícones do que sai dos baús (vêm de folhas diferentes): 0 moeda (pontos), 1 poção verde (+1 coração).
+ITENS = [('recur', (6, 1)), ('esot', (2, 2))]
+
 abertas = {k: Image.open(E + v).convert('RGBA') for k, v in FOLHAS.items()}
 
 
@@ -66,3 +72,10 @@ def montar(linhas, ficheiro):
 
 montar(TILES, 'tiles.png')
 montar(CRIPTA, 'cripta.png')
+
+# Folha dos ícones: uma só linha, um ícone por frame.
+itens = Image.new('RGBA', (len(ITENS) * T, T), (0, 0, 0, 0))
+for x, (origem, (cx, cy)) in enumerate(ITENS):
+    itens.paste(abertas[origem].crop((cx * T, cy * T, cx * T + T, cy * T + T)), (x * T, 0))
+itens.save(SAIDA + 'itens.png')
+print('itens.png -> frames 0 (moeda) e 1 (poção)')

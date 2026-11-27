@@ -3,8 +3,8 @@ import Inimigo from './Inimigo.js';
 // Slime: avança aos saltos. Quando o Calan está perto, salta na direção dele;
 // quando está longe, salta numa direção ao acaso.
 export default class Slime extends Inimigo {
-  constructor(scene, x, y, multVel) {
-    super(scene, x, y, 'slime', 'slime', multVel);
+  constructor(scene, x, y, nivel) {
+    super(scene, x, y, 'slime', 'slime', nivel);
     this.body.setSize(16, 10);
     this.body.setOffset(7, 14);
     this.proximoSalto = scene.time.now + Phaser.Math.Between(400, 1200);

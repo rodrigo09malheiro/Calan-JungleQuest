@@ -1,4 +1,4 @@
-import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, CENTRO_CALAN } from '../config.js';
+import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, CENTRO_CALAN, BAUS_EXTRA, ICONE_MOEDA } from '../config.js';
 import Aleatorio from '../sistemas/Aleatorio.js';
 import Calan from '../entities/Calan.js';
 import Slime from '../entities/Slime.js';
@@ -144,12 +144,12 @@ export default class GameScene extends Phaser.Scene {
       const Classe = CLASSES_INIMIGO[def.tipo];
       // Posição em píxeis: centro do tile em x, fundo do tile em y (origem nos pés).
       const x = def.tx * TILE + TILE / 2, y = def.ty * TILE + TILE;
-      const inimigo = new Classe(this, x, y, this.cfg.velocidade);
+      const inimigo = new Classe(this, x, y, this.cfg);   // o nível define velocidade e vida
       this.inimigos.add(inimigo);
     }
   }
 
-  // Baú (sala do tesouro) e escada (sala de saída): só aparecem com a sala limpa.
+  // Baú (sala do tesouro ou baú extra) e escada (sala de saída): só aparecem com a sala limpa.
   criarObjetos() {
     if (this.sala.limpa) this.mostrarRecompensas(false);
   }
@@ -157,7 +157,8 @@ export default class GameScene extends Phaser.Scene {
   // Mostra o baú e/ou a escada. comEfeito = true quando a sala acaba de ser limpa
   // (aparecem com um fade); false quando o Calan volta a uma sala já limpa.
   mostrarRecompensas(comEfeito) {
-    if (this.sala.tipo === 'tesouro' && !this.sala.tesouroApanhado) {
+    const temBau = this.sala.tipo === 'tesouro' || this.sala.bauExtra;
+    if (temBau && !this.sala.tesouroApanhado) {
       this.bau = this.physics.add.staticImage(CENTRO_X, CENTRO_Y - 4, 'bau').setDepth(CENTRO_Y);
       this.physics.add.overlap(this.calan, this.bau, this.abrirBau, null, this);
       if (comEfeito) this.aparecer(this.bau);
@@ -296,19 +297,56 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  // O Calan tocou no baú: +500 pontos, +1 coração e conta para as métricas (estilo cauteloso).
-  // O baú do nível 1 guarda também a espada (é opcional: fica num beco sem saída).
+  // O Calan tocou no baú. Todos contam para as métricas (estilo cauteloso).
+  //  - Sala do tesouro: +500 pontos e +1 coração; no nível 1 guarda também a espada.
+  //  - Baú extra (beco sem saída): moedas (pontos) ou poção (+1 coração), ver BAUS_EXTRA.
+  // O que se ganha sai do baú como ícone e sobe por cima do Calan.
   abrirBau() {
     if (this.sala.tesouroApanhado) return;
     this.sala.tesouroApanhado = true;
     this.sons.tocar('tesouro');
-    this.partida.somarPontos(500);
     this.partida.metricas.tesouro();
-    // Um tesouro também recupera 1 coração.
-    this.partida.vida = Math.min(this.partida.vida + 1, VIDA_CALAN);
-    this.textoFlutuante(CENTRO_X, CENTRO_Y - 24, 'Tesouro! +500', '#ffd34d');
-    if (this.partida.nivel === 0 && !this.partida.temEspada) this.encontrarEspada();
+
+    if (this.sala.tipo === 'tesouro') {
+      this.partida.somarPontos(500);
+      this.curar(1);
+      this.textoFlutuante(CENTRO_X, CENTRO_Y - 24, 'Tesouro! +500', '#ffd34d');
+      if (this.partida.nivel === 0 && !this.partida.temEspada) this.encontrarEspada();
+      else this.mostrarItem('itens', ICONE_MOEDA);
+    } else {
+      const c = BAUS_EXTRA.conteudos[this.sala.bauExtra];
+      if (c.pontos) {
+        this.partida.somarPontos(c.pontos);
+        this.textoFlutuante(CENTRO_X, CENTRO_Y - 24, `+${c.pontos}`, '#ffd34d');
+      }
+      if (c.vida) {
+        // Com a vida cheia, a poção vale pontos em vez de se perder.
+        const curou = this.curar(c.vida);
+        this.textoFlutuante(CENTRO_X, CENTRO_Y - 24, curou ? `+${c.vida} vida` : '+100', curou ? '#9fffa8' : '#ffd34d');
+        if (!curou) this.partida.somarPontos(100);
+      }
+      this.mostrarItem('itens', c.icone);
+    }
     this.bau.destroy();
+  }
+
+  // Recupera vida sem passar do máximo. Devolve false se a vida já estava cheia.
+  curar(n) {
+    if (this.partida.vida >= VIDA_CALAN) return false;
+    this.partida.vida = Math.min(this.partida.vida + n, VIDA_CALAN);
+    return true;
+  }
+
+  // Um ícone sai do baú (no centro da sala), sobe por cima do Calan e desaparece.
+  // Fica 50 px acima dos pés: acima da cabeça e do texto dos pontos.
+  mostrarItem(textura, frame) {
+    const item = this.add.image(CENTRO_X, CENTRO_Y - 8, textura, frame).setDepth(5000);
+    this.tweens.add({
+      targets: item, x: this.calan.x, y: this.calan.y - 50, duration: 600, ease: 'Sine.easeOut',
+      onComplete: () => this.tweens.add({
+        targets: item, alpha: 0, delay: 900, duration: 400, onComplete: () => item.destroy(),
+      }),
+    });
   }
 
   // A espada sai do baú e sobe por cima do Calan; a partir daqui
@@ -321,13 +359,7 @@ export default class GameScene extends Phaser.Scene {
       ate: Date.now() + 2500,
       y: 560,   // em baixo, para não tapar a espada a subir (o baú fica no centro)
     };
-    const espada = this.add.image(CENTRO_X, CENTRO_Y - 8, 'efeitos_calan', 0).setDepth(5000);
-    this.tweens.add({
-      targets: espada, x: this.calan.x, y: this.calan.y - 40, duration: 600, ease: 'Sine.easeOut',
-      onComplete: () => this.tweens.add({
-        targets: espada, alpha: 0, delay: 900, duration: 400, onComplete: () => espada.destroy(),
-      }),
-    });
+    this.mostrarItem('efeitos_calan', 0);
   }
 
   // ---------- Mudança de sala e de nível ----------

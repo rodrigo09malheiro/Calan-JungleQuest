@@ -24,6 +24,8 @@ export default class BootScene extends Phaser.Scene {
     // Cenário: tileset montado a partir do pack Pixel Crawler (ver CREDITS.md).
     this.load.spritesheet('tiles', asset('cenario/tiles.png'), { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('cripta', asset('cenario/cripta.png'), { frameWidth: 16, frameHeight: 16 });
+    // Ícones dos baús: 0 moeda, 1 poção (do pack Pixel Crawler).
+    this.load.spritesheet('itens', asset('cenario/itens.png'), { frameWidth: 16, frameHeight: 16 });
     // Boss: 0 cara normal, 1 cara ferida, 2 cara de ataque; 3 mão, 4 mão a cair, 5 mão a lançar;
     // 6 feitiço, 7 feitiço forte; 8-10 impacto do feitiço (ver FRAMES_BOSS em Boss.js).
     this.load.spritesheet('boss', asset('boss.png'), { frameWidth: 64, frameHeight: 64 });

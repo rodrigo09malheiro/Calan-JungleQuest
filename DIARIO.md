@@ -207,6 +207,25 @@
 - O que alterei/validei:
   - Redesenhei todos os frames do Calan com os golpes incluídos, depois de perguntar se isso resolvia os problemas do arco.
 
+### Sessão 8 (continuação) — baús extra e nível 2 mais difícil
+**Objetivo:** mais recompensas por explorar e um nível 2 mais exigente (ideias minhas).
+
+**Atividades realizadas:**
+- Baús extra: no `GeradorNivel`, cada beco sem saída que não é a sala do tesouro tem 50% de probabilidade (com a semente) de esconder um baú, com moedas (+200) ou, mais raramente, uma poção (+1 coração; com a vida cheia vale +100). Valores em `BAUS_EXTRA` no `config.js`. Em 300 sementes saem em média 0,33 baús extra no nível 1 e 0,67 no nível 2.
+- Ao abrir um baú, o que se ganha sai do baú como ícone e sobe por cima do Calan (moeda, poção ou espada). Os ícones vêm do pack Pixel Crawler (`itens.png`, montada pelo `montar_tileset.py`).
+- No minimapa, um ponto amarelo marca um baú por abrir.
+- Inimigos do nível 2 com 1,5x a vida (`vidaInimigos` em `NIVEIS`): slime 2 -> 3, olho 3 -> 5. Os inimigos recebem a configuração do nível em vez de só a velocidade.
+
+**Decisões:**
+- O conteúdo dos baús extra é escolhido com pesos (3 moedas para 1 poção) para o jogo não ficar fácil demais.
+- Mais vida no nível 2 dá mais valor à espada (com ela, o slime morre em 2 golpes em vez de 3).
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: procura dos ícones no pack, código dos baús extra e da vida por nível, testes no XAMPP.
+- O que alterei/validei:
+  - As ideias (mais baús nos becos sem saída, ícone a sair do baú, mais vida no nível 2) foram minhas; pedi para procurar os ícones no pack.
+
 ---
 
 # Declaração de utilização de IA

@@ -1,4 +1,4 @@
-import { SALA_LARGURA, SALA_ALTURA, PORTAS, OPOSTA, PASSO } from '../config.js';
+import { SALA_LARGURA, SALA_ALTURA, PORTAS, OPOSTA, PASSO, BAUS_EXTRA } from '../config.js';
 import Orcamento from './Orcamento.js';
 
 // CONCEITO TÉCNICO: geração procedimental do layout das salas.
@@ -9,7 +9,8 @@ import Orcamento from './Orcamento.js';
 //    Depois juntam-se algumas ligações extra entre salas vizinhas para haver ciclos.
 // 2) VERIFICAÇÃO: uma pesquisa em largura (BFS) a partir da entrada confirma que todas
 //    as salas são alcançáveis e dá a distância de cada sala à entrada.
-//    A saída é a sala MAIS LONGE da entrada; o tesouro vai para um beco sem saída.
+//    A saída é a sala MAIS LONGE da entrada; o tesouro vai para um beco sem saída
+//    e os outros becos podem ter um baú extra (com uma probabilidade e a semente).
 // 3) SALAS: cada sala recebe pedras ao acaso; um "flood fill" confirma que todas as
 //    portas e todo o chão continuam ligados (senão tenta outra vez).
 // 4) DESAFIOS: o orçamento de dificuldade de cada sala é gasto em inimigos (Orcamento.js).
@@ -43,7 +44,7 @@ export default class GeradorNivel {
       const sala = {
         id: salas.length, gx, gy,
         vizinhos: { cima: null, baixo: null, esq: null, dir: null },
-        tipo: 'normal', distancia: 0,
+        tipo: 'normal', distancia: 0, bauExtra: null,   // bauExtra: 'moedas', 'pocao' ou null
         visitada: false, limpa: false, tesouroApanhado: false,
       };
       salas.push(sala);
@@ -114,6 +115,14 @@ export default class GeradorNivel {
     const becos = livres.filter((s) => portas(s) === 1);
     const tesouro = becos.length > 0 ? this.rng.escolher(becos) : this.rng.escolher(livres);
     if (tesouro) tesouro.tipo = 'tesouro';
+
+    // Baús extra: os outros becos sem saída podem esconder um baú (recompensa por explorar).
+    const conteudos = Object.entries(BAUS_EXTRA.conteudos).map(([tipo, c]) => ({ tipo, peso: c.peso }));
+    for (const s of becos) {
+      if (s.tipo === 'normal' && this.rng.chance(BAUS_EXTRA.chance)) {
+        s.bauExtra = this.rng.escolherComPeso(conteudos).tipo;
+      }
+    }
   }
 
   // ---------- 3) Conteúdo de cada sala ----------

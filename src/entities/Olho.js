@@ -3,8 +3,8 @@ import Inimigo from './Inimigo.js';
 // Olho de chamas: mantém distância do Calan e dispara bolas de fogo.
 // Se o Calan se aproxima, afasta-se; se está longe, aproxima-se.
 export default class Olho extends Inimigo {
-  constructor(scene, x, y, multVel) {
-    super(scene, x, y, 'olho', 'olho', multVel);
+  constructor(scene, x, y, nivel) {
+    super(scene, x, y, 'olho', 'olho', nivel);
     this.body.setSize(14, 12);
     this.body.setOffset(10, 18);
     this.proximoTiro = scene.time.now + Phaser.Math.Between(1200, 2200);
