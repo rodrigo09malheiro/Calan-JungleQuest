@@ -1,4 +1,4 @@
-import { NIVEIS, VIDA_CALAN, BOSS } from '../config.js';
+import { NIVEIS, VIDA_CALAN, BOSS, ARMAS } from '../config.js';
 import Aleatorio from './Aleatorio.js';
 import GeradorNivel from './GeradorNivel.js';
 import Metricas from './Metricas.js';
@@ -15,6 +15,7 @@ export default class Partida {
     this.avaliacao = null;      // estilo, variante e fator do boss (calculados ao chegar ao boss)
     this.boss = null;           // estado do boss para o HUD (só durante a luta)
     this.bossDerrotado = false;
+    this.temEspada = false;     // passa a true ao abrir o baú do nível 1
     this.nivel = 0;
     this.iniciarNivel(0);
   }
@@ -46,6 +47,7 @@ export default class Partida {
   get cfg() { return NIVEIS[this.nivel]; }
   get sala() { return this.mapa.salas[this.salaAtual]; }
   get ultimoNivel() { return this.nivel === NIVEIS.length - 1; }
+  get arma() { return this.temEspada ? ARMAS.espada : ARMAS.maos; }   // arma em uso
 
   // Gera o mapa do nível n e põe o Calan na sala de entrada.
   iniciarNivel(n) {

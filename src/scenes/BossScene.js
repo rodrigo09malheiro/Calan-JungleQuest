@@ -1,6 +1,6 @@
 import {
   TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA,
-  VIDA_CALAN, TILES_CRIPTA, GRAVIDADE, CHAO_Y, BOSS,
+  VIDA_CALAN, TILES_CRIPTA, GRAVIDADE, CHAO_Y, BOSS, ARCO, CENTRO_CALAN,
 } from '../config.js';
 import Aleatorio from '../sistemas/Aleatorio.js';
 import GeradorArena from '../sistemas/GeradorArena.js';
@@ -41,7 +41,9 @@ export default class BossScene extends Phaser.Scene {
 
     // 3) Personagens: o Calan entra pela porta da esquerda; o guardião desce do teto.
     this.calan = new CalanLateral(this, 4 * TILE, CHAO_Y * TILE);
-    this.boss = new Boss(this, 13 * TILE, -40, this.variante, fator, rng, this.arena.plataformas);
+    // O guardião adapta-se também à arma: com a espada (dano 2) tem o dobro da vida,
+    // para a luta durar o mesmo número de golpes com ou sem espada.
+    this.boss = new Boss(this, 13 * TILE, -40, this.variante, fator, rng, this.arena.plataformas, p.arma.dano);
     this.feiticos = this.physics.add.group({ allowGravity: false });
 
     this.criarColisoes();
@@ -160,20 +162,26 @@ export default class BossScene extends Phaser.Scene {
   }
 
   // ---------- Combate ----------
-  // Golpe do Calan: arco da espada à frente e zona de dano (como nas salas).
+  // Golpe do Calan: arco da arma à frente e zona de dano (como nas salas).
   golpe(calan) {
     this.sons.tocar('golpe');
+    const arma = this.partida.arma;
     const lado = calan.olhaEsquerda ? -1 : 1;
-    const cx = calan.x + lado * 16;
-    const cy = calan.y - 12;
-    const arco = this.add.image(cx, cy, 'efeitos_calan', 2).setAngle(lado > 0 ? 0 : 180).setDepth(110);
+    const cx = calan.x + lado * arma.alcance;
+    const cy = calan.y - CENTRO_CALAN;   // meio do corpo
+    // Arco centrado no meio do Calan (origem no centro do próprio desenho).
+    const arcoX = calan.x + lado * (arma.alcance + ARCO.afastar);
+    const [ox, oy] = ARCO.centros[arma.arco];
+    const arco = this.add.image(arcoX, cy, 'efeitos_calan', arma.arco)
+      .setOrigin(ox / 32, oy / 32).setAngle(lado > 0 ? 0 : 180).setDepth(110);
     this.tweens.add({ targets: arco, alpha: 0, duration: 200, onComplete: () => arco.destroy() });
 
+    const t = arma.tamanho;
     let acertou = false;
     const verificar = () => {
       if (acertou) return;
-      const corpos = this.physics.overlapRect(cx - 12, cy - 14, 24, 28, true, false);
-      if (corpos.some((c) => c.gameObject === this.boss) && this.boss.levarDano(1)) {
+      const corpos = this.physics.overlapRect(cx - t / 2, cy - t / 2, t, t, true, false);
+      if (corpos.some((c) => c.gameObject === this.boss) && this.boss.levarDano(arma.dano)) {
         acertou = true;
         this.partida.somarPontos(50);
         this.textoFlutuante(this.boss.x, this.boss.y - 28, '+50', '#ffe08a');

@@ -1,4 +1,4 @@
-import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES } from '../config.js';
+import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, ARCO, CENTRO_CALAN } from '../config.js';
 import Aleatorio from '../sistemas/Aleatorio.js';
 import Calan from '../entities/Calan.js';
 import Slime from '../entities/Slime.js';
@@ -206,29 +206,37 @@ export default class GameScene extends Phaser.Scene {
 
   // ---------- Combate ----------
   // Chamado pelo evento 'calan-ataca' (emitido em Calan.atacar()).
+  // O alcance, a zona e o dano dependem da arma: mãos ou espada (ARMAS em config.js).
   golpe(calan) {
     this.sons.tocar('golpe');
+    const arma = this.partida.arma;
     const d = calan.vetorDirecao();
-    // Centro do golpe: à frente do Calan, à altura do corpo.
-    const cx = calan.x + d.x * 14;
-    const cy = calan.y - 9 + d.y * 13;
+    // Centro do golpe: à frente do Calan, a partir do meio do corpo (os pés estão em calan.y).
+    const meioY = calan.y - CENTRO_CALAN;
+    const cx = calan.x + d.x * arma.alcance;
+    const cy = meioY + d.y * arma.alcance;
 
-    // Efeito visual: o arco da espada, rodado para a direção do golpe.
+    // Efeito visual: o arco da arma (pequeno com as mãos, grande com a espada), rodado para a direção do golpe.
     const angulo = d.x > 0 ? 0 : d.x < 0 ? 180 : d.y > 0 ? 90 : -90;
-    const arco = this.add.image(cx, cy, 'efeitos_calan', 2).setAngle(angulo).setDepth(calan.y + 1);
+    // A origem do arco é o centro do próprio desenho, por isso fica centrado no meio do Calan.
+    const dist = arma.alcance + ARCO.afastar;
+    const [ox, oy] = ARCO.centros[arma.arco];
+    const arco = this.add.image(calan.x + d.x * dist, meioY + d.y * dist, 'efeitos_calan', arma.arco)
+      .setOrigin(ox / 32, oy / 32).setAngle(angulo).setDepth(calan.y + 1);
     this.tweens.add({ targets: arco, alpha: 0, duration: 200, onComplete: () => arco.destroy() });
 
-    // Zona de dano: retângulo à frente do Calan. Cada inimigo só leva 1 golpe por ataque.
-    const largura = d.x !== 0 ? 20 : 26;
-    const altura = d.x !== 0 ? 22 : 18;
+    // Zona de dano: quadrado à frente do Calan. Cada inimigo só leva 1 golpe por ataque.
+    // Só contam os corpos do grupo dos inimigos: a zona também toca no próprio Calan
+    // (sobretudo no golpe para baixo) e ele não se pode atingir a si mesmo.
+    const t = arma.tamanho;
     const atingidos = new Set();
     const verificar = () => {
-      const corpos = this.physics.overlapRect(cx - largura / 2, cy - altura / 2, largura, altura, true, false);
+      const corpos = this.physics.overlapRect(cx - t / 2, cy - t / 2, t, t, true, false);
       for (const corpo of corpos) {
         const alvo = corpo.gameObject;
-        if (alvo && alvo.levarDano && !atingidos.has(alvo)) {
+        if (alvo && this.inimigos.contains(alvo) && !atingidos.has(alvo)) {
           atingidos.add(alvo);
-          alvo.levarDano(1, calan.x, calan.y - 8);
+          alvo.levarDano(arma.dano, calan.x, calan.y - 8);
         }
       }
     };
@@ -297,6 +305,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // O Calan tocou no baú: +500 pontos, +1 coração e conta para as métricas (estilo cauteloso).
+  // O baú do nível 1 guarda também a espada (é opcional: fica num beco sem saída).
   abrirBau() {
     if (this.sala.tesouroApanhado) return;
     this.sala.tesouroApanhado = true;
@@ -306,7 +315,27 @@ export default class GameScene extends Phaser.Scene {
     // Um tesouro também recupera 1 coração.
     this.partida.vida = Math.min(this.partida.vida + 1, VIDA_CALAN);
     this.textoFlutuante(CENTRO_X, CENTRO_Y - 24, 'Tesouro! +500', '#ffd34d');
+    if (this.partida.nivel === 0 && !this.partida.temEspada) this.encontrarEspada();
     this.bau.destroy();
+  }
+
+  // A espada sai do baú e sobe por cima do Calan; a partir daqui
+  // os golpes têm mais alcance e o dobro do dano.
+  encontrarEspada() {
+    this.partida.temEspada = true;
+    this.sons.tocar('vitoria');
+    this.partida.mensagem = {
+      linhas: ['Encontraste a espada!', 'Mais alcance e o dobro do dano'],
+      ate: Date.now() + 2500,
+      y: 560,   // em baixo, para não tapar a espada a subir (o baú fica no centro)
+    };
+    const espada = this.add.image(CENTRO_X, CENTRO_Y - 8, 'efeitos_calan', 0).setDepth(5000);
+    this.tweens.add({
+      targets: espada, x: this.calan.x, y: this.calan.y - 40, duration: 600, ease: 'Sine.easeOut',
+      onComplete: () => this.tweens.add({
+        targets: espada, alpha: 0, delay: 900, duration: 400, onComplete: () => espada.destroy(),
+      }),
+    });
   }
 
   // ---------- Mudança de sala e de nível ----------

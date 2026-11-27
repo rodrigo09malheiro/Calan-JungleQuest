@@ -23,6 +23,7 @@ export default class GameOverScene extends Phaser.Scene {
     const linhas = [
       `Inimigos derrotados: ${t.inimigos}   Tesouros: ${t.tesouros}   Dano sofrido: ${t.dano}`,
       `Tempo médio por sala: ${a.tempoPorSala.toFixed(1)} s   Estilo: ${a.estilo}`,
+      p.temEspada ? 'Arma: espada' : 'Arma: mãos (a espada ficou por encontrar)',
     ];
     if (p.boss) {
       const estado = p.bossDerrotado ? 'derrotado' : 'invicto';

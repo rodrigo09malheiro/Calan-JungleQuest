@@ -16,6 +16,9 @@ export default class HUDScene extends Phaser.Scene {
     this.txtSemente = this.add.text(560, 50, '', { ...estilo, fontSize: '14px', color: '#8a8aa0' });
 
     this.coracoes = this.add.graphics();
+
+    // Ícone da espada: escuro enquanto não for encontrada, normal depois de a apanhar.
+    this.iconeEspada = this.add.image(572, 24, 'efeitos_calan', 0).setScale(2);
     this.minimapa = this.add.graphics();
 
     // Barra de vida do guardião (só aparece na BossScene).
@@ -38,6 +41,7 @@ export default class HUDScene extends Phaser.Scene {
     this.txtPontos.setText(`Pontos: ${p.pontuacao}`);
     this.txtSemente.setText(`seed ${p.semente}`);
     this.desenharCoracoes(p.vida);
+    this.iconeEspada.setTint(p.temEspada ? 0xffffff : 0x303040).setAlpha(p.temEspada ? 1 : 0.7);
 
     if (p.boss) {
       // Luta com o boss: título com a variante e barra de vida no lugar do minimapa.
@@ -54,6 +58,7 @@ export default class HUDScene extends Phaser.Scene {
 
   // Mensagem de uma ou duas linhas, numa caixa escura com contorno.
   // A 1.ª linha fica a branco e a 2.ª a amarelo (ex.: a variante do boss).
+  // m.y (opcional) muda a altura no ecrã, para a caixa não tapar o que está a acontecer.
   desenharMensagem(m) {
     const g = this.caixaMensagem.clear();
     if (!m || Date.now() >= m.ate) {
@@ -62,12 +67,13 @@ export default class HUDScene extends Phaser.Scene {
       return;
     }
     const linhas = m.linhas || [m.texto];
-    this.txtMensagem.setText(linhas[0]);
-    this.txtMensagem2.setText(linhas[1] || '');
+    const yCentro = m.y || 300;
+    this.txtMensagem.setText(linhas[0]).setY(yCentro);
+    this.txtMensagem2.setText(linhas[1] || '').setY(yCentro + 42);
     // Caixa à medida das duas linhas, com margem.
     const largura = Math.max(this.txtMensagem.width, this.txtMensagem2.width) + 48;
     const altura = linhas.length > 1 ? 104 : 64;
-    const x = ECRA_LARGURA / 2 - largura / 2, y = 300 - 32;
+    const x = ECRA_LARGURA / 2 - largura / 2, y = yCentro - 32;
     g.fillStyle(0x000000, 0.75).fillRect(x, y, largura, altura);
     g.lineStyle(2, 0xffffff).strokeRect(x, y, largura, altura);
   }

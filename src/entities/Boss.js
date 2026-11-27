@@ -30,7 +30,7 @@ const CORPO_QUEDA = { larg: 12, alt: 21, ox: 26, oy: 19, fundo: 8 };    // fundo
 // caveira quando cai a pique (ataque "descer"). Tocar na caveira a flutuar não magoa,
 // para valer a pena subir às plataformas e atacá-la de perto.
 export default class Boss extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, variante, fator, rng, plataformas) {
+  constructor(scene, x, y, variante, fator, rng, plataformas, danoCalan) {
     super(scene, x, y, 'boss', F.cara);
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -42,7 +42,8 @@ export default class Boss extends Phaser.Physics.Arcade.Sprite {
     this.fator = fator;
     this.rng = rng;
     this.plataformas = plataformas;         // para as mãos pararem em cima delas
-    this.vidaMax = Math.round(variante.vida * fator);
+    // Vida = vida da variante x fator do desempenho x dano da arma do Calan.
+    this.vidaMax = Math.round(variante.vida * fator * danoCalan);
     this.vida = this.vidaMax;
     this.ativo = false;                     // só ataca depois da apresentação
     this.morto = false;

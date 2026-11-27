@@ -1,7 +1,7 @@
-import { FRAME_CALAN, SALTO_CALAN } from '../config.js';
+import { FRAME_CALAN, ALTURA_CALAN, PES_CALAN, SALTO_CALAN } from '../config.js';
 
 // Frames da folha do Calan usados na vista lateral (só as vistas "de lado").
-const FRAME = { parado: 1, subir: 4, cair: 7, ataque: 10 };
+const FRAME = { parado: 1, subir: 4, cair: 7, ataqueEspada: 17 };   // sem espada: animação 'calan-murro-lado'
 
 const VELOCIDADE = 90;          // píxeis de arte por segundo
 const DURACAO_ATAQUE = 260;     // ms em que o Calan fica a golpear
@@ -18,10 +18,10 @@ export default class CalanLateral extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     // Origem nos pés; a hitbox é o corpo inteiro (na vista lateral a cabeça também conta).
-    this.setOrigin(0.5, 1);
+    this.setOrigin(0.5, PES_CALAN / ALTURA_CALAN);   // pés na linha 34 da célula de 34x46
     const larg = 12, alt = 24;
     this.body.setSize(larg, alt);
-    this.body.setOffset((FRAME_CALAN - larg) / 2, FRAME_CALAN - alt);
+    this.body.setOffset((FRAME_CALAN - larg) / 2, PES_CALAN - alt);
     this.setDepth(100);
 
     this.olhaEsquerda = false;
@@ -96,9 +96,12 @@ export default class CalanLateral extends Phaser.Physics.Arcade.Sprite {
   atacar() {
     this.aAtacar = true;
     this.anims.stop();
-    this.setFrame(FRAME.ataque);
+    if (this.scene.partida.temEspada) this.setFrame(FRAME.ataqueEspada);
+    else this.anims.play('calan-murro-lado');
     this.scene.events.emit('calan-ataca', this);
-    this.scene.time.delayedCall(DURACAO_ATAQUE, () => { this.aAtacar = false; });
+    // Cancela o fim do golpe anterior (se ainda estiver pendente), para não cortar este.
+    if (this.fimAtaque) this.fimAtaque.remove();
+    this.fimAtaque = this.scene.time.delayedCall(DURACAO_ATAQUE, () => { this.aAtacar = false; });
   }
 
   podeLevarDano(time) {

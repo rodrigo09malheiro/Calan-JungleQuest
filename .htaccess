@@ -1,0 +1,7 @@
+# Configuração do Apache (XAMPP) para esta pasta.
+# "no-cache" obriga o navegador a confirmar com o servidor se cada ficheiro mudou
+# antes de usar a cópia guardada. Sem isto, depois de alterar o código ou as imagens,
+# o navegador podia continuar a usar versões antigas (por exemplo a folha antiga do Calan).
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-cache"
+</IfModule>

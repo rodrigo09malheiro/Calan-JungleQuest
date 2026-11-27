@@ -12,8 +12,32 @@ export const ECRA_LARGURA = 960;   // tamanho da janela do jogo (píxeis do ecr�
 export const ECRA_ALTURA = SALA_ALTURA * TILE * SCALE + HUD_ALTURA;   // 624 da sala + HUD = 696
 
 export const VEL_CALAN = 70;       // píxeis de arte por segundo
-export const FRAME_CALAN = 34;     // cada célula da folha do Calan tem 34x34
+// Folha do Calan (assets/calan.png, montada por ferramentas/montar_calan.py a partir
+// do calan_vfinal2.piskel): grelha 4x5 de células 34x46 com os pés sempre na linha 34;
+// os 12 píxeis de baixo servem para a espada no ataque para baixo.
+export const FRAME_CALAN = 34;     // largura de uma célula
+export const ALTURA_CALAN = 46;    // altura de uma célula
+export const PES_CALAN = 34;       // linha dos pés dentro da célula (origem do sprite)
+export const CENTRO_CALAN = 12;    // meio do desenho do Calan, em píxeis acima dos pés (o desenho tem ~23 px)
 export const VIDA_CALAN = 6;       // vida máxima (corações)
+
+// Arco desenhado no golpe (só o desenho; a zona de dano usa ARMAS.alcance).
+//  afastar: píxeis a somar ao alcance da arma, para o arco ficar à frente do corpo
+//  centros: centro do desenho de cada arco dentro da célula 32x32 de efeitos_calan.png
+//           (os desenhos não estão centrados na célula; a origem do arco passa a ser este ponto,
+//           para o arco ficar centrado no meio do Calan e rodar à volta do próprio centro)
+export const ARCO = {
+  afastar: 4,
+  centros: { 1: [16, 15.5], 2: [16.5, 17.5] },
+};
+
+// Armas do Calan. Começa só com as mãos; a espada está no baú do nível 1 (opcional).
+//  dano: vida que tira por golpe     alcance: distância do centro do golpe ao Calan
+//  tamanho: lado da zona de dano     arco: frame de efeitos_calan.png desenhado no golpe
+export const ARMAS = {
+  maos:   { nome: 'mãos',   dano: 1, alcance: 5,  tamanho: 14, arco: 1 },
+  espada: { nome: 'espada', dano: 2, alcance: 15, tamanho: 24, arco: 2 },
+};
 
 // Portas: tiles da parede que abrem quando existe uma sala vizinha nesse lado.
 export const PORTAS = {

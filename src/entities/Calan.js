@@ -1,8 +1,9 @@
-import { VEL_CALAN, FRAME_CALAN } from '../config.js';
+import { VEL_CALAN, FRAME_CALAN, ALTURA_CALAN, PES_CALAN } from '../config.js';
 
 // Frames da folha do Calan para cada direção.
 const FRAME_PARADO = { baixo: 0, lado: 1, cima: 2 };
-const FRAME_ATAQUE = { baixo: 9, lado: 10, cima: 11 };
+// Ataque com espada: um frame por direção. Sem espada há a animação 'calan-murro-<direção>'.
+const FRAME_ATAQUE_ESPADA = { baixo: 16, lado: 17, cima: 18 };
 
 const DURACAO_ATAQUE = 260;     // ms em que o Calan fica a golpear
 const INVULNERAVEL = 1000;      // ms sem levar dano depois de ser atingido
@@ -15,12 +16,13 @@ export default class Calan extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     // A origem fica nos PÉS: a posição (x, y) é onde o Calan pisa o chão.
-    this.setOrigin(0.5, 1);
+    // Os pés estão na linha PES_CALAN da célula (por baixo há espaço para a espada).
+    this.setOrigin(0.5, PES_CALAN / ALTURA_CALAN);
 
     // Hitbox pequena junto aos pés (12x8), para o corpo poder "passar por trás" das paredes de cima.
     const larg = 12, alt = 8;
     this.body.setSize(larg, alt);
-    this.body.setOffset((FRAME_CALAN - larg) / 2, FRAME_CALAN - alt);
+    this.body.setOffset((FRAME_CALAN - larg) / 2, PES_CALAN - alt);
 
     this.direcao = 'baixo';     // para onde está virado: baixo, lado ou cima
     this.olhaEsquerda = false;  // quando está de lado, se está virado para a esquerda
@@ -91,15 +93,20 @@ export default class Calan extends Phaser.Physics.Arcade.Sprite {
     return { x: 0, y: this.direcao === 'baixo' ? 1 : -1 };
   }
 
-  // Golpe de espada: muda o frame e avisa a cena, que cria a zona de dano e o efeito.
+  // Golpe (com as mãos ou com a espada): muda o frame e avisa a cena, que cria a zona de dano e o efeito.
   atacar() {
     this.aAtacar = true;
     this.anims.stop();
-    this.setFrame(FRAME_ATAQUE[this.direcao]);
+    // Com a espada mostra o frame em que ela aparece; sem espada, a animação do murro.
+    if (this.scene.partida.temEspada) this.setFrame(FRAME_ATAQUE_ESPADA[this.direcao]);
+    else this.anims.play(`calan-murro-${this.direcao}`);
     this.setVelocity(0, 0);
     this.scene.events.emit('calan-ataca', this);
-    this.scene.time.delayedCall(DURACAO_ATAQUE, () => {
+    // Cancela o fim do golpe anterior (se ainda estiver pendente), para não cortar este.
+    if (this.fimAtaque) this.fimAtaque.remove();
+    this.fimAtaque = this.scene.time.delayedCall(DURACAO_ATAQUE, () => {
       this.aAtacar = false;
+      this.anims.stop();
       this.setFrame(FRAME_PARADO[this.direcao]);
     });
   }

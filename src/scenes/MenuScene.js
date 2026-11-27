@@ -15,6 +15,7 @@ export default class MenuScene extends Phaser.Scene {
       'No guardião: CIMA ou W para saltar',
       '',
       'Derrota os inimigos para abrir as portas.',
+      'Há uma espada escondida num baú do nível 1.',
       'Encontra o tesouro, desce as escadas e derrota o guardião.',
       '',
       'Prime ENTER para jogar',

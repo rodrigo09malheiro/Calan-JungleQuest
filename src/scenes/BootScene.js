@@ -1,27 +1,34 @@
-import { FRAME_CALAN } from '../config.js';
+import { FRAME_CALAN, ALTURA_CALAN } from '../config.js';
 import { LISTA_SONS } from '../sistemas/Sons.js';
+
+// Caminho de um asset com um número diferente em cada arranque (?v=...).
+// Assim o navegador pede sempre a versão atual do ficheiro e nunca usa uma imagem
+// antiga guardada em cache (o que, ao mudar o tamanho das células do Calan,
+// fazia aparecer pedaços de outros frames por baixo dele).
+const ARRANQUE = Date.now();
+const asset = (ficheiro) => `assets/${ficheiro}?v=${ARRANQUE}`;
 
 // Carrega todos os assets e cria as animações. Depois passa para o Menu.
 export default class BootScene extends Phaser.Scene {
   constructor() { super('Boot'); }
 
   preload() {
-    // Folha do Calan: grelha 4x4 de células 34x34 (frames 0 a 15, linha a linha).
-    this.load.spritesheet('calan', 'assets/calan.png', { frameWidth: FRAME_CALAN, frameHeight: FRAME_CALAN });
+    // Folha do Calan: grelha 4x5 de células 34x46 (frames 0 a 18, linha a linha).
+    this.load.spritesheet('calan', asset('calan.png'), { frameWidth: FRAME_CALAN, frameHeight: ALTURA_CALAN });
     // Efeitos: 0 espada, 1 arco pequeno, 2 e 3 arcos do golpe.
-    this.load.spritesheet('efeitos_calan', 'assets/efeitos_calan.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('efeitos_calan', asset('efeitos_calan.png'), { frameWidth: 32, frameHeight: 32 });
     // Slime: 0 redondo, 1 achatado, 2 muito achatado, 3 esticado (salto).
-    this.load.spritesheet('slime', 'assets/slime.png', { frameWidth: 30, frameHeight: 24 });
+    this.load.spritesheet('slime', asset('slime.png'), { frameWidth: 30, frameHeight: 24 });
     // Olho: 0 e 1 a flutuar, 2 a carregar o tiro, 3 atordoado.
-    this.load.spritesheet('olho', 'assets/olho_chamas.png', { frameWidth: 34, frameHeight: 34 });
+    this.load.spritesheet('olho', asset('olho_chamas.png'), { frameWidth: 34, frameHeight: 34 });
     // Cenário: tileset montado a partir do pack Pixel Crawler (ver CREDITS.md).
-    this.load.spritesheet('tiles', 'assets/cenario/tiles.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('cripta', 'assets/cenario/cripta.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('tiles', asset('cenario/tiles.png'), { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('cripta', asset('cenario/cripta.png'), { frameWidth: 16, frameHeight: 16 });
     // Boss: 0 cara normal, 1 cara ferida, 2 cara de ataque; 3 mão, 4 mão a cair, 5 mão a lançar;
     // 6 feitiço, 7 feitiço forte; 8-10 impacto do feitiço (ver FRAMES_BOSS em Boss.js).
-    this.load.spritesheet('boss', 'assets/boss.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('boss', asset('boss.png'), { frameWidth: 64, frameHeight: 64 });
 
-    for (const nome of LISTA_SONS) this.load.audio(nome, `assets/sons/${nome}.wav`);
+    for (const nome of LISTA_SONS) this.load.audio(nome, asset(`sons/${nome}.wav`));
   }
 
   create() {
@@ -33,7 +40,8 @@ export default class BootScene extends Phaser.Scene {
   criarAnimacoes() {
     // Calan. Mapa dos frames (começam em 0):
     //   parado: 0 frente, 1 lado, 2 costas
-    //   andar 1: 3, 4, 5      andar 2: 6, 7, 8      ataque: 9, 10, 11
+    //   andar 1: 3, 4, 5      andar 2: 6, 7, 8
+    //   murro (sem espada): 9, 10, 11 -> 12, 13, 14      ataque com espada: 16, 17, 18
     // O ciclo de andar usa o "parado" como frame de passagem: andar1, parado, andar2, parado.
     const anda = (chave, a, p, b) =>
       this.anims.create({
@@ -45,6 +53,13 @@ export default class BootScene extends Phaser.Scene {
     anda('calan-andar-baixo', 3, 0, 6);
     anda('calan-andar-lado', 4, 1, 7);
     anda('calan-andar-cima', 5, 2, 8);
+
+    // Murro sem espada: 2 tempos (puxar o braço e esticá-lo), dura o mesmo que o golpe (260 ms).
+    const murro = (chave, puxar, esticar) =>
+      this.anims.create({ key: chave, frames: [puxar, esticar].map((frame) => ({ key: 'calan', frame })), frameRate: 8 });
+    murro('calan-murro-baixo', 9, 12);
+    murro('calan-murro-lado', 10, 13);
+    murro('calan-murro-cima', 11, 14);
 
     // Slime: respira parado; ao saltar achata, estica e volta ao normal.
     this.anims.create({ key: 'slime-parado', frames: this.anims.generateFrameNumbers('slime', { frames: [0, 1] }), frameRate: 3, repeat: -1 });

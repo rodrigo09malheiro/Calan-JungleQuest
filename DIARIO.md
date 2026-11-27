@@ -149,6 +149,46 @@
   - Pedi a mão a cair rodada -90º, 2 feitiços com o guardião calmo e 3 na fúria, e o ajuste dos tamanhos.
   - Pedi que as mãos e os feitiços não atravessassem as plataformas.
 
+### Sessão 8 (continuação) — espada
+**Objetivo:** espada como recompensa opcional do nível 1.
+
+**Atividades realizadas:**
+- Ideia minha: o Calan começa sem espada e encontra-a no baú do nível 1, depois de limpar a sala do tesouro.
+- `ARMAS` em `config.js`: mãos (golpe curto, 1 de dano, arco pequeno) e espada (mais alcance, 2 de dano, arco grande). O golpe nas salas e no boss lê a arma da `Partida` (`partida.arma`).
+- Ao abrir o baú do nível 1, a espada sai do baú e sobe por cima do Calan, com a mensagem "Encontraste a espada!". O baú continua a dar +500 pontos e +1 coração.
+- Ícone da espada no HUD (escuro até ser encontrada), dica no menu e linha "Arma" no ecrã de resultados.
+- O guardião adapta-se à arma: a vida é multiplicada pelo dano do Calan (com a espada tem o dobro), para a luta durar o mesmo número de golpes com ou sem espada.
+- Desenhei no Piskel os ataques do Calan com a espada e juntei tudo num só ficheiro (`calan_vfinal2.piskel`, 19 frames): parado, andar, o murro em dois tempos (puxar e esticar o braço) e o ataque com espada, de frente, de lado e de costas. A folha do Calan é montada a partir desse ficheiro pelo script `ferramentas/montar_calan.py` (lê o `.piskel` diretamente) numa grelha 4x5.
+- Sem espada, o golpe é a animação do murro (frames 9→12, 10→13, 11→14) com o arco pequeno; com espada, os frames 16, 17 e 18 com o arco grande.
+
+**Problemas:**
+- A caixa da mensagem "Encontraste a espada!" tapava a espada a subir, porque o baú fica no centro da sala.
+- No ataque com espada para baixo, a espada fica abaixo dos pés. Para caber na célula de 34x34, o Calan estava desenhado 12 píxeis mais acima e, como a origem do sprite está nos pés, ia "saltar" em cada golpe.
+- Ao testar no XAMPP apareceu uma "segunda cabeça" do Calan por baixo dos pés (gravei um vídeo do bug). O navegador estava a usar a folha antiga (células 34x34) e o `Calan.js` antigo guardados em cache, misturados com o código novo (células 34x46): cada frame lia 12 píxeis a mais e apanhava o topo do frame de baixo.
+- Ao investigar, apareceu outro problema: o temporizador que termina um golpe podia disparar já durante o golpe seguinte e cortá-lo.
+- Num segundo vídeo, o golpe para baixo era cortado e o Calan mexia-se sozinho. Pus uma "armadilha" na variável `aAtacar` para ver quem a mudava: era o próprio golpe. A zona de dano tocava na hitbox do Calan e, como ele também tem um método `levarDano`, era tratado como inimigo.
+
+**Solução:**
+- As mensagens do HUD passaram a aceitar uma altura (`y`); a da espada aparece na parte de baixo do ecrã.
+- A folha do Calan passou a ter células de 34x46: os pés ficam sempre na linha 34 (`PES_CALAN` em `config.js`) e os 12 píxeis de baixo servem para a espada. A origem e a hitbox usam essa linha.
+- `.htaccess` na pasta do jogo: o Apache envia `Cache-Control: no-cache`, por isso o navegador confirma sempre se os ficheiros mudaram. Na `BootScene`, as imagens e os sons são pedidos com `?v=<arranque>`, para nunca virem da cache (útil também com outros servidores).
+- Cada golpe novo cancela o temporizador do golpe anterior.
+- O golpe só atinge corpos do grupo dos inimigos (`this.inimigos.contains(alvo)`).
+- A folha do Calan passou a vir só do meu ficheiro do Piskel (`calan_vfinal2.piskel`, que junta os frames antigos e os da espada), em vez de ser montada a partir de várias fontes. O arco do golpe passou a ficar centrado no meio do desenho do Calan (`CENTRO_CALAN` em `config.js`). Para isso foi preciso medir o centro de cada desenho de arco: no `efeitos_calan.png` os arcos não estão centrados nas células de 32x32, por isso a origem de cada arco passou a ser o centro do próprio desenho (`ARCO.centros`). Notei o problema ao testar e marquei numa imagem onde queria o arco.
+
+**Decisões:**
+- A espada é opcional: fica na sala do tesouro, que o gerador põe num beco sem saída. Quem explora (estilo cauteloso) fica mais forte; quem corre para a saída luta só com as mãos.
+- O boss adapta-se a tudo: à variante e ao fator do desempenho, e também à arma do Calan.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: implementação da espada, do ícone no HUD, da adaptação do boss à arma e testes no browser.
+- O que alterei/validei:
+  - A ideia da espada no baú do nível 1 foi minha.
+  - Decidi que a espada é opcional, que o boss se adapta a tudo e que o baú dá a espada e também os pontos e o coração.
+  - Desenhei os frames de ataque com espada, juntei-os num só ficheiro do Piskel com os frames antigos e pedi que a folha do Calan viesse desse ficheiro.
+  - Gravei vídeos dos bugs que encontrei ao testar.
+
 ---
 
 # Declaração de utilização de IA
@@ -167,6 +207,7 @@
 | Cenário | Escolha dos tiles do pack Pixel Crawler e script `ferramentas/montar_tileset.py` | Usado (o pack está creditado em `CREDITS.md`) |
 | Depuração | Diagnóstico do jogo a congelar ao mudar de sala (grupos reutilizados no `scene.restart()`) | Correção aplicada |
 | Boss e dificuldade adaptativa | Proposta da arena, `BossScene`, `Boss`, `CalanLateral`, `GeradorArena` e ligação das métricas ao boss | Usado |
+| Espada | Armas na configuração, espada no baú do nível 1, ícone no HUD e adaptação do boss à arma (a ideia foi minha) | Usado |
 | Documentação | Comentários no código, README e organização deste diário | Usado |
 
 **Decisões e alterações feitas por mim:**
