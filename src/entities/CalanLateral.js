@@ -1,4 +1,5 @@
 import { FRAME_CALAN, ALTURA_CALAN, PES_CALAN, SALTO_CALAN } from '../config.js';
+import Toque from '../sistemas/Toque.js';
 
 // Frames da folha do Calan usados na vista lateral (só as vistas "de lado").
 const FRAME = { parado: 1, subir: 4, cair: 7, ataqueEspada: 17 };   // sem espada: animação 'calan-murro-lado'
@@ -36,6 +37,8 @@ export default class CalanLateral extends Phaser.Physics.Arcade.Sprite {
       a: 'A', d: 'D', w: 'W',
       atacar: 'SPACE', j: 'J',
     });
+    // No telemóvel: joystick para os lados, botões SALTAR e ATACAR (ToqueScene).
+    Toque.limparPedidos();
   }
 
   update(time) {
@@ -48,12 +51,15 @@ export default class CalanLateral extends Phaser.Physics.Arcade.Sprite {
     if (time < this.empurradoAte) return;
 
     // Ataque (também no ar).
-    if (!this.aAtacar && (Phaser.Input.Keyboard.JustDown(t.atacar) || Phaser.Input.Keyboard.JustDown(t.j))) {
+    const toqueAtacar = Toque.consumir('atacar');
+    if (!this.aAtacar && (Phaser.Input.Keyboard.JustDown(t.atacar) || Phaser.Input.Keyboard.JustDown(t.j) || toqueAtacar)) {
       this.atacar();
     }
 
     // Movimento horizontal. A atacar no chão fica parado; no ar mantém o impulso.
-    const vx = ((t.dir.isDown || t.d.isDown) ? 1 : 0) - ((t.esq.isDown || t.a.isDown) ? 1 : 0);
+    let vx = ((t.dir.isDown || t.d.isDown) ? 1 : 0) - ((t.esq.isDown || t.a.isDown) ? 1 : 0);
+    // Joystick: basta incliná-lo para o lado (a velocidade é sempre a mesma, como no teclado).
+    if (vx === 0 && Math.abs(Toque.x) > 0.3) vx = Math.sign(Toque.x);
     if (this.aAtacar && apoiado) {
       this.setVelocityX(0);
     } else {
@@ -65,14 +71,15 @@ export default class CalanLateral extends Phaser.Physics.Arcade.Sprite {
     }
 
     // Salto: só a partir do chão (ou logo a seguir a sair dele).
-    const saltar = Phaser.Input.Keyboard.JustDown(t.cima) || Phaser.Input.Keyboard.JustDown(t.w);
+    const toqueSaltar = Toque.consumir('saltar');
+    const saltar = Phaser.Input.Keyboard.JustDown(t.cima) || Phaser.Input.Keyboard.JustDown(t.w) || toqueSaltar;
     if (saltar && time < this.noChaoAte) {
       this.setVelocityY(-SALTO_CALAN);
       this.noChaoAte = 0;
       this.scene.sons.tocar('salto');
     }
     // Salto variável: largar a tecla a meio da subida corta o salto (mais controlo).
-    const aSegurar = t.cima.isDown || t.w.isDown;
+    const aSegurar = t.cima.isDown || t.w.isDown || Toque.saltar;
     if (!aSegurar && this.body.velocity.y < -120) this.setVelocityY(this.body.velocity.y * 0.5);
 
     this.escolherFrame(apoiado, vx);

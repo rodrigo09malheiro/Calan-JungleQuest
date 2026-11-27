@@ -1,4 +1,5 @@
 import { ECRA_LARGURA, HUD_ALTURA, VIDA_CALAN, NIVEIS } from '../config.js';
+import Toque from '../sistemas/Toque.js';
 
 // HUD: faixa no topo com vida, pontuação, nível, semente e minimapa
 // (na luta com o boss, o minimapa dá lugar à barra de vida do guardião).
@@ -32,6 +33,12 @@ export default class HUDScene extends Phaser.Scene {
     const estiloMsg = { fontFamily: 'monospace', fontSize: '28px', color: '#ffffff', align: 'center' };
     this.txtMensagem = this.add.text(ECRA_LARGURA / 2, 300, '', estiloMsg).setOrigin(0.5);
     this.txtMensagem2 = this.add.text(ECRA_LARGURA / 2, 342, '', { ...estiloMsg, color: '#ffe08a' }).setOrigin(0.5);
+
+    // Telemóvel/tablet: abre os comandos táteis por cima de tudo e fecha-os com o HUD.
+    if (Toque.ativo) {
+      this.scene.launch('Toque');
+      this.events.once('shutdown', () => this.scene.stop('Toque'));
+    }
   }
 
   update() {

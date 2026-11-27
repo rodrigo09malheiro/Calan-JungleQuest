@@ -250,6 +250,27 @@
 - O que alterei/validei:
   - Joguei várias vezes, percebi que nunca chegava ao boss e escolhi quais das propostas aplicar.
 
+### Sessão 8 (continuação) — versão para telemóvel
+**Objetivo:** poder jogar no telemóvel, com comandos táteis que só aparecem em ecrãs táteis (no PC fica tudo igual).
+
+**Atividades realizadas:**
+- `sistemas/Toque.js`: deteta se o ecrã é tátil (ponteiro principal "grosso", ou seja, o dedo) e guarda o estado dos comandos (joystick e botões). Atalhos de teste: `?toque=1` força os comandos no PC; `?toque=0` desliga-os.
+- `scenes/ToqueScene.js`: cena por cima do HUD com um joystick na metade esquerda (a base aparece onde o dedo toca), o botão ATACAR à direita, o botão SALTAR só na luta com o boss e um botão MENU (toque duplo, no lugar do ESC). Aceita até 3 dedos ao mesmo tempo (`activePointers: 3`).
+- O `Calan` e o `CalanLateral` leem o teclado e o `Toque`. Nas salas o joystick é analógico (inclinar pouco anda devagar); no boss basta incliná-lo para o lado. Os botões funcionam como o `JustDown` do teclado, e segurar SALTAR dá o salto mais alto, como a tecla.
+- Menu e Game Over: no telemóvel as instruções falam dos comandos táteis e joga-se a tocar no ecrã (no Game Over há dois botões). O jogo tenta abrir em ecrã inteiro e na horizontal.
+- `index.html`: sem zoom nem scroll ao tocar no jogo e, com o telemóvel na vertical, um aviso para o rodar.
+- Testado no browser em modo PC (sem comandos) e a imitar um telemóvel na horizontal (joystick, ataque e salto) e na vertical (aviso).
+
+**Decisões:**
+- Os comandos táteis ficam numa cena à parte, aberta pelo HUD: o resto do jogo não muda e no PC esta cena nunca abre.
+- A deteção usa o tipo de ponteiro e não o tamanho do ecrã, para um portátil com ecrã tátil e rato continuar a ser tratado como PC.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: código dos comandos táteis, adaptação do menu e do ecrã de resultados e testes a imitar um telemóvel.
+- O que alterei/validei:
+  - Pedi a versão para telemóvel com joystick e botões só quando são precisos, sem mudar nada no PC.
+
 ---
 
 # Declaração de utilização de IA
@@ -269,6 +290,7 @@
 | Depuração | Diagnóstico do jogo a congelar ao mudar de sala (grupos reutilizados no `scene.restart()`) | Correção aplicada |
 | Boss e dificuldade adaptativa | Proposta da arena, `BossScene`, `Boss`, `CalanLateral`, `GeradorArena` e ligação das métricas ao boss | Usado |
 | Espada | Armas na configuração, espada no baú do nível 1, ícone no HUD e adaptação do boss à arma (a ideia foi minha) | Usado |
+| Telemóvel | `Toque.js`, `ToqueScene` (joystick e botões táteis), adaptação do menu, do Game Over e do `index.html` | Usado |
 | Documentação | Comentários no código, README e organização deste diário | Usado |
 
 **Decisões e alterações feitas por mim:**
