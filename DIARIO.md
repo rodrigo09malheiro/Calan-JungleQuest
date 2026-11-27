@@ -271,6 +271,20 @@
 - O que alterei/validei:
   - Pedi a versão para telemóvel com joystick e botões só quando são precisos, sem mudar nada no PC.
 
+### Sessão 8 (continuação) — bug: inimigo a atravessar a parede
+**Problema:** a jogar no telemóvel, um olho de chamas saiu da sala pela parede de baixo (tirei uma captura de ecrã).
+
+**Causa:** no Arcade Physics, o `collider` só separa dois corpos se estiverem pouco sobrepostos (até ~4 px, o `OVERLAP_BIAS`). Se um empurrão (um golpe do Calan, outro inimigo) enterra o inimigo mais do que isso na parede, o `collider` deixa de o separar e o inimigo continua a andar através dela. O olho foge do Calan, por isso continua a andar para fora.
+
+**Solução:** na `GameScene`, os limites do mundo físico passaram a ser o interior da sala (`physics.world.setBounds`, sem a parede de 1 tile à volta) e os inimigos têm `setCollideWorldBounds(true)`. Os limites do mundo corrigem a posição seja qual for a sobreposição, por isso servem de rede de segurança. O Calan não fica preso a estes limites, porque tem de passar pelas portas.
+
+**Teste:** pus inimigos já enterrados na parede de baixo a andar para fora. Sem a correção saíam da sala; com ela, ficam no interior.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: diagnóstico do bug, correção e teste.
+- O que alterei/validei: encontrei o bug a jogar no telemóvel e enviei a captura de ecrã.
+
 ---
 
 # Declaração de utilização de IA
