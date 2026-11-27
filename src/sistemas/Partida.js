@@ -1,4 +1,4 @@
-import { NIVEIS, VIDA_CALAN } from '../config.js';
+import { NIVEIS, VIDA_CALAN, BOSS } from '../config.js';
 import Aleatorio from './Aleatorio.js';
 import GeradorNivel from './GeradorNivel.js';
 import Metricas from './Metricas.js';
@@ -12,8 +12,27 @@ export default class Partida {
     this.vida = VIDA_CALAN;
     this.pontuacao = 0;
     this.metricas = new Metricas();
+    this.avaliacao = null;      // estilo, variante e fator do boss (calculados ao chegar ao boss)
+    this.boss = null;           // estado do boss para o HUD (só durante a luta)
+    this.bossDerrotado = false;
     this.nivel = 0;
     this.iniciarNivel(0);
+  }
+
+  // Começa uma partida nova e abre a cena certa. Usado pelo Menu e pelo Game Over.
+  // Atalho de teste: index.html?boss=tanque (ou agil) salta direto para o boss com fator 1;
+  // index.html?boss=1 salta para o boss e deixa as métricas escolherem a variante.
+  static comecar(scene) {
+    const partida = new Partida(Partida.sementeInicial());
+    scene.registry.set('partida', partida);
+    const atalho = new URLSearchParams(window.location.search).get('boss');
+    if (atalho) {
+      partida.iniciarNivel(NIVEIS.length - 1);
+      if (BOSS[atalho]) partida.avaliacao = { estilo: 'teste', variante: atalho, fator: 1, tempoPorSala: 0 };
+      scene.scene.start('Boss');
+    } else {
+      scene.scene.start('Game');
+    }
   }
 
   // Semente ao acaso, ou a da URL (index.html?seed=1234) para repetir uma partida.

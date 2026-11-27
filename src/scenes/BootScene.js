@@ -16,6 +16,9 @@ export default class BootScene extends Phaser.Scene {
     this.load.spritesheet('olho', 'assets/olho_chamas.png', { frameWidth: 34, frameHeight: 34 });
     // Cenário: tileset montado a partir do pack Pixel Crawler (ver CREDITS.md).
     this.load.spritesheet('tiles', 'assets/cenario/tiles.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('cripta', 'assets/cenario/cripta.png', { frameWidth: 16, frameHeight: 16 });
+    // Boss: 0 cara normal, 1 cara ferida, 2 cara de ataque; 3 mão, 4 mão a cair, 5 mão a lançar;
+    // 6 feitiço, 7 feitiço forte; 8-10 impacto do feitiço (ver FRAMES_BOSS em Boss.js).
     this.load.spritesheet('boss', 'assets/boss.png', { frameWidth: 64, frameHeight: 64 });
 
     for (const nome of LISTA_SONS) this.load.audio(nome, `assets/sons/${nome}.wav`);
@@ -48,6 +51,9 @@ export default class BootScene extends Phaser.Scene {
     this.anims.create({ key: 'slime-salto', frames: this.anims.generateFrameNumbers('slime', { frames: [2, 3, 3, 0] }), frameRate: 10, repeat: 0 });
 
     // Olho: as chamas tremem.
+    // Boss: sequência do impacto quando um feitiço acerta no Calan (frames 8, 9 e 10).
+    this.anims.create({ key: 'feitico-impacto', frames: this.anims.generateFrameNumbers('boss', { frames: [8, 9, 10] }), frameRate: 12, repeat: 0 });
+
     this.anims.create({ key: 'olho-parado', frames: this.anims.generateFrameNumbers('olho', { frames: [0, 1] }), frameRate: 5, repeat: -1 });
   }
 

@@ -1,7 +1,8 @@
 import { ECRA_LARGURA, HUD_ALTURA, VIDA_CALAN, NIVEIS } from '../config.js';
 
-// HUD: faixa no topo com vida, pontuação, nível, semente e minimapa.
-// Corre em paralelo com a GameScene, sem zoom, e lê o estado da Partida a cada frame.
+// HUD: faixa no topo com vida, pontuação, nível, semente e minimapa
+// (na luta com o boss, o minimapa dá lugar à barra de vida do guardião).
+// Corre em paralelo com a GameScene/BossScene, sem zoom, e lê o estado da Partida a cada frame.
 export default class HUDScene extends Phaser.Scene {
   constructor() { super('HUD'); }
 
@@ -17,25 +18,71 @@ export default class HUDScene extends Phaser.Scene {
     this.coracoes = this.add.graphics();
     this.minimapa = this.add.graphics();
 
-    // Mensagem grande no centro do ecrã (ex.: nome do nível).
-    this.txtMensagem = this.add.text(ECRA_LARGURA / 2, 300, '', {
-      fontFamily: 'monospace', fontSize: '32px', color: '#ffffff', stroke: '#000000', strokeThickness: 6,
-    }).setOrigin(0.5);
+    // Barra de vida do guardião (só aparece na BossScene).
+    this.barraBoss = this.add.graphics();
+    this.txtBoss = this.add.text(640, 8, 'Vida do guardião', { ...estilo, fontSize: '16px', color: '#dcc8c8' }).setVisible(false);
+    this.vidaMostrada = null;   // valor que a barra mostra; desce aos poucos até à vida real
+
+    // Mensagem no centro do ecrã, numa caixa (ex.: nome do nível, variante do boss).
+    this.caixaMensagem = this.add.graphics();
+    // Duas linhas com cores diferentes: título a branco, pormenor a amarelo.
+    const estiloMsg = { fontFamily: 'monospace', fontSize: '28px', color: '#ffffff', align: 'center' };
+    this.txtMensagem = this.add.text(ECRA_LARGURA / 2, 300, '', estiloMsg).setOrigin(0.5);
+    this.txtMensagem2 = this.add.text(ECRA_LARGURA / 2, 342, '', { ...estiloMsg, color: '#ffe08a' }).setOrigin(0.5);
   }
 
   update() {
     const p = this.registry.get('partida');
     if (!p) return;
 
-    this.txtNivel.setText(`Nível ${p.nivel + 1}/${NIVEIS.length} · ${p.cfg.nome}`);
     this.txtPontos.setText(`Pontos: ${p.pontuacao}`);
     this.txtSemente.setText(`seed ${p.semente}`);
-
     this.desenharCoracoes(p.vida);
-    this.desenharMinimapa(p);
 
-    const m = p.mensagem;
-    this.txtMensagem.setText(m && Date.now() < m.ate ? m.texto : '');
+    if (p.boss) {
+      // Luta com o boss: título com a variante e barra de vida no lugar do minimapa.
+      this.txtNivel.setText(`Boss final · Guardião ${p.boss.nome}`);
+      this.minimapa.clear();
+      this.desenharBarraBoss(p.boss);
+    } else {
+      this.txtNivel.setText(`Nível ${p.nivel + 1}/${NIVEIS.length} · ${p.cfg.nome}`);
+      this.desenharMinimapa(p);
+    }
+
+    this.desenharMensagem(p.mensagem);
+  }
+
+  // Mensagem de uma ou duas linhas, numa caixa escura com contorno.
+  // A 1.ª linha fica a branco e a 2.ª a amarelo (ex.: a variante do boss).
+  desenharMensagem(m) {
+    const g = this.caixaMensagem.clear();
+    if (!m || Date.now() >= m.ate) {
+      this.txtMensagem.setText('');
+      this.txtMensagem2.setText('');
+      return;
+    }
+    const linhas = m.linhas || [m.texto];
+    this.txtMensagem.setText(linhas[0]);
+    this.txtMensagem2.setText(linhas[1] || '');
+    // Caixa à medida das duas linhas, com margem.
+    const largura = Math.max(this.txtMensagem.width, this.txtMensagem2.width) + 48;
+    const altura = linhas.length > 1 ? 104 : 64;
+    const x = ECRA_LARGURA / 2 - largura / 2, y = 300 - 32;
+    g.fillStyle(0x000000, 0.75).fillRect(x, y, largura, altura);
+    g.lineStyle(2, 0xffffff).strokeRect(x, y, largura, altura);
+  }
+
+  // Barra de vida do guardião. A parte "perdida" fica a branco um instante,
+  // porque a barra desce aos poucos até ao valor real (dá a sensação de impacto).
+  desenharBarraBoss(boss) {
+    this.txtBoss.setVisible(true);
+    if (this.vidaMostrada === null) this.vidaMostrada = boss.vidaMax;
+    this.vidaMostrada += (boss.vida - this.vidaMostrada) * 0.08;
+    const x = 640, y = 32, w = 300, h = 18;
+    const g = this.barraBoss.clear();
+    g.lineStyle(2, 0xc8c8c8).strokeRect(x, y, w, h);
+    g.fillStyle(0xffffff).fillRect(x + 3, y + 3, (w - 6) * (this.vidaMostrada / boss.vidaMax), h - 6);
+    g.fillStyle(0xc8323c).fillRect(x + 3, y + 3, (w - 6) * (boss.vida / boss.vidaMax), h - 6);
   }
 
   // Corações como quadrados de pixel art: cheios (vermelho) ou vazios (cinzento).

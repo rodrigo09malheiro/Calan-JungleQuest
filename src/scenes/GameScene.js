@@ -323,7 +323,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // O Calan pisou a escada da sala de saída: passa ao nível seguinte (gerado de novo)
-  // ou, no último nível, termina a partida com vitória.
+  // ou, no último nível, desce para a arena do boss.
   descer() {
     if (this.aMudar) return;
     this.aMudar = true;
@@ -333,7 +333,7 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.fadeOut(500);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       if (this.partida.ultimoNivel) {
-        this.fimDeJogo(true);   // o boss entra aqui numa fase seguinte
+        this.scene.start('Boss');   // depois do último nível: luta com o guardião
       } else {
         this.partida.iniciarNivel(this.partida.nivel + 1);
         this.scene.restart();

@@ -36,4 +36,8 @@ save('porta', seq(tom(392, 392, 0.08, 'triangulo', 0.5), tom(523, 523, 0.14, 'tr
 save('tesouro', seq(*[tom(f, f, 0.08, 'quadrada', 0.3) for f in (523, 659, 784, 1046)]))
 save('fogo', tom(400, 120, 0.22, 'sin', 0.35, ruido=0.85))
 save('nivel', seq(*[tom(f, f, d, 'quadrada', 0.3) for f, d in ((392,.1),(523,.1),(659,.1),(784,.25))]))
+# Boss: impacto das mãos no chão, salto do Calan e fanfarra de vitória.
+save('impacto', tom(120, 40, 0.35, 'quadrada', 0.6, ruido=0.6))
+save('salto', tom(300, 600, 0.10, 'quadrada', 0.25))
+save('vitoria', seq(*[tom(f, f, d, 'quadrada', 0.3) for f, d in ((523,.12),(659,.12),(784,.12),(1046,.2),(784,.1),(1046,.35))]))
 print('ok')

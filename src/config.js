@@ -76,3 +76,51 @@ export const TILES = {
   porta:      { inicio: 56, n: 1 },
   planta:     { inicio: 64, n: 8 },
 };
+
+// ---------- Boss (vista lateral) ----------
+
+// Frames de assets/cenario/cripta.png (montada por ferramentas/montar_tileset.py).
+export const TILES_CRIPTA = {
+  fundo: [0, 1, 2, 3, 4, 5],        // tijolo da parede de fundo
+  teto: [6, 7, 8],
+  coluna: [9, 10],                  // paredes laterais
+  chao: [11, 12, 13],               // topo do chão
+  plataforma: { esq: 14, dir: 15, meio: [16, 17, 18] },
+  janela: [19, 20, 21, 24, 25, 26], // 3x2
+  estandarte: [32, 33, 34, 35, 36, 37, 38, 39],  // 2x4
+  porta: [40, 41, 42, 43, 44, 45],  // 2x3
+};
+
+// Física da vista lateral (só ativa na BossScene).
+export const GRAVIDADE = 900;       // píxeis de arte por segundo ao quadrado
+export const SALTO_CALAN = 360;     // velocidade inicial do salto: sobe ~72 px (4,5 tiles)
+export const CHAO_Y = 11;           // linha de tiles onde começa o chão da arena
+
+// Variantes do guardião. A métrica do jogador escolhe a variante (Metricas.avaliar)
+// e o fator (0,8 a 1,5) multiplica a vida e a velocidade e encurta as pausas.
+export const BOSS = {
+  tanque: {
+    nome: 'TANQUE',
+    vida: 14,                       // golpes para o derrotar (antes do fator)
+    pausa: 1700,                    // ms entre ataques (dividido pelo fator)
+    velTiro: 90,                    // velocidade dos feitiços (multiplicada pelo fator)
+    feiticos: 2,                    // feitiços por ataque com o guardião calmo
+    feiticosFuria: 3,               // feitiços por ataque na fúria
+    // Pesos dos ataques: o Tanque prefere esmagar com as mãos.
+    ataques: [{ nome: 'esmagar', peso: 3 }, { nome: 'disparar', peso: 1 }, { nome: 'descer', peso: 1 }],
+    // Arena: plataformas mais altas e mais afastadas, para fugir das mãos.
+    arena: { quantas: [2, 3], linhas: [4, 7], larguras: [3, 4], separacao: 3 },
+  },
+  agil: {
+    nome: 'ÁGIL',
+    vida: 10,
+    pausa: 1100,
+    velTiro: 125,
+    feiticos: 2,
+    feiticosFuria: 3,
+    // O Ágil prefere lançar rajadas de feitiços.
+    ataques: [{ nome: 'esmagar', peso: 1 }, { nome: 'disparar', peso: 3 }, { nome: 'descer', peso: 1 }],
+    // Arena: plataformas mais baixas e mais próximas, para fugir dos feitiços.
+    arena: { quantas: [3, 3], linhas: [6, 8], larguras: [4, 5], separacao: 1 },
+  },
+};

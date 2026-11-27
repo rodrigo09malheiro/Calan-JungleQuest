@@ -12,17 +12,15 @@ export default class MenuScene extends Phaser.Scene {
     this.add.text(cx, 360, [
       'Setas ou WASD: andar',
       'ESPAÇO ou J: atacar com a espada',
+      'No guardião: CIMA ou W para saltar',
       '',
       'Derrota os inimigos para abrir as portas.',
-      'Encontra o tesouro e desce a escada da última sala.',
+      'Encontra o tesouro, desce as escadas e derrota o guardião.',
       '',
       'Prime ENTER para jogar',
     ], { fontSize: '22px', color: '#cfd8dc', align: 'center' }).setOrigin(0.5);
 
-    this.input.keyboard.once('keydown-ENTER', () => {
-      // Nova partida: gera o nível 1 a partir de uma semente nova.
-      this.registry.set('partida', new Partida(Partida.sementeInicial()));
-      this.scene.start('Game');
-    });
+    // Nova partida: gera o nível 1 a partir de uma semente nova.
+    this.input.keyboard.once('keydown-ENTER', () => Partida.comecar(this));
   }
 }

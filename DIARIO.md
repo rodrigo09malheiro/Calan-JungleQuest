@@ -112,6 +112,43 @@
   - Pedi para mudar o projeto da subpasta para a raiz do repositório.
   - Revi e aprovei cada commit antes de ser enviado para o GitHub.
 
+## Sessão 8 — 27 de novembro de 2026
+**Objetivo:** luta com o boss em vista lateral e dificuldade adaptativa.
+
+**Atividades realizadas:**
+- Imagem de proposta da arena (cripta com tiles do Pixel Crawler), aprovada antes de programar.
+- `GeradorArena.js`: as plataformas da arena são geradas com a semente, dentro das regras da variante (Tanque: mais altas e afastadas; Ágil: mais baixas e próximas), e uma pesquisa em largura (BFS) confirma que todas se alcançam a saltar a partir do chão. Testado com 1000 sementes: nenhuma precisou da arena de reserva.
+- `CalanLateral.js`: andar, saltar (com salto variável e uma pequena margem depois de sair de uma plataforma) e atacar, com gravidade só nesta cena.
+- `Boss.js`: caveira a flutuar com duas mãos e três ataques: esmagar (a mão roda, treme como aviso e cai a pique até ao chão ou à plataforma de baixo), feitiço (as duas mãos lançam feitiços em leque, que ganham potência a meio do trajeto) e descer (a caveira desce e fica vulnerável). Abaixo de metade da vida entra em fúria (cara ferida, ataques mais rápidos, 3 feitiços em vez de 2, as duas mãos esmagam).
+- Cada frame do `boss.png` tem um uso definido (`FRAMES_BOSS` em `Boss.js`): cara normal, cara ferida, cara de ataque; mão normal, mão a cair (rodada -90º), mão a lançar feitiço; feitiço, feitiço forte; e a sequência de impacto (3 frames) quando um feitiço acerta no Calan.
+- Dificuldade adaptativa ligada ao jogo: as métricas dos níveis 1 e 2 escolhem a variante (Tanque ou Ágil) e o fator (0,8 a 1,5), que multiplica a vida e a velocidade dos feitiços e encurta as pausas entre ataques. A variante muda também a escolha dos ataques e a arena.
+- HUD com barra de vida do guardião e caixa de mensagem (desempenho e variante, à entrada).
+- Sons novos: impacto, salto e vitória. Atalhos de teste `?boss=tanque` e `?boss=agil`.
+
+- Depois de testar, revi os ataques: mudei o uso dos frames do boss, a rotação da mão, o número de feitiços e o tamanho dos feitiços (reduzidos para 60%, porque o desenho era quase do tamanho do Calan).
+
+**Problemas:**
+- As plataformas mais altas ficavam à altura da caveira, por isso subir para a atacar magoava sempre o Calan.
+- As mãos e os feitiços atravessavam as plataformas.
+
+**Solução:**
+- A caveira só magoa quando cai a pique (ataque "descer"); a flutuar, tocar-lhe não tira vida. Subir às plataformas passou a ser a forma de a atacar.
+- A mão calcula a primeira superfície por baixo dela (plataforma ou chão) e pára aí; ficar debaixo de uma plataforma protege do ataque. Os feitiços usam `overlap` com as plataformas e desfazem-se ao tocar-lhes, mesmo vindos de baixo (o `overlap` ignora a colisão "só por cima").
+
+**Decisões:**
+- As plataformas são geradas (e não fixas) para a arena também seguir o tema da geração procedimental.
+- Plataformas atravessáveis por baixo para o Calan (colisão só por cima), para o salto ser mais fluido.
+- 2 feitiços por ataque com o guardião calmo e 3 na fúria, nas duas variantes; a diferença entre variantes está na frequência, na velocidade e na escolha dos ataques.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: imagem de proposta da arena, código da BossScene, do boss, do Calan lateral e do gerador da arena, testes no browser e comentários.
+- O que alterei/validei:
+  - Aprovei a imagem da arena antes de se programar.
+  - Testei a luta e defini o uso de cada frame do boss (caras, mãos, feitiço e impacto).
+  - Pedi a mão a cair rodada -90º, 2 feitiços com o guardião calmo e 3 na fúria, e o ajuste dos tamanhos.
+  - Pedi que as mãos e os feitiços não atravessassem as plataformas.
+
 ---
 
 # Declaração de utilização de IA
@@ -129,6 +166,7 @@
 | Som | Script `ferramentas/gerar_sons.py`, que gera os efeitos em WAV | Usado |
 | Cenário | Escolha dos tiles do pack Pixel Crawler e script `ferramentas/montar_tileset.py` | Usado (o pack está creditado em `CREDITS.md`) |
 | Depuração | Diagnóstico do jogo a congelar ao mudar de sala (grupos reutilizados no `scene.restart()`) | Correção aplicada |
+| Boss e dificuldade adaptativa | Proposta da arena, `BossScene`, `Boss`, `CalanLateral`, `GeradorArena` e ligação das métricas ao boss | Usado |
 | Documentação | Comentários no código, README e organização deste diário | Usado |
 
 **Decisões e alterações feitas por mim:**

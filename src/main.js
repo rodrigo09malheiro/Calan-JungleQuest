@@ -3,6 +3,7 @@ import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import GameScene from './scenes/GameScene.js';
 import HUDScene from './scenes/HUDScene.js';
+import BossScene from './scenes/BossScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
 
 // Configuração principal do Phaser.
@@ -15,7 +16,7 @@ const config = {
   pixelArt: true,                       // sem suavização: os píxeis ficam nítidos
   physics: {
     default: 'arcade',                  // física Arcade (exigida pelo enunciado)
-    arcade: { gravity: { y: 0 }, debug: false },   // vista de cima: sem gravidade
+    arcade: { gravity: { y: 0 }, debug: false },   // vista de cima: sem gravidade (a BossScene liga-a)
   },
   scale: {
     mode: Phaser.Scale.FIT,             // ajusta à janela
@@ -23,7 +24,7 @@ const config = {
   },
   // Ordem das cenas: a primeira (Boot) arranca sozinha; as outras são abertas pelo código.
   // O HUD corre por cima da GameScene ao mesmo tempo (scene.launch).
-  scene: [BootScene, MenuScene, GameScene, HUDScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, BossScene, HUDScene, GameOverScene],
 };
 
 // window.jogo permite inspecionar o jogo na consola do navegador (depuração).

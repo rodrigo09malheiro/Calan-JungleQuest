@@ -1,6 +1,7 @@
 // Efeitos sonoros. Os ficheiros são carregados na BootScene (assets/sons/*.wav)
 // e gerados pelo script ferramentas/gerar_sons.py.
-export const LISTA_SONS = ['golpe', 'acerto', 'inimigo_morre', 'dano', 'porta', 'tesouro', 'fogo', 'nivel'];
+export const LISTA_SONS = ['golpe', 'acerto', 'inimigo_morre', 'dano', 'porta', 'tesouro', 'fogo', 'nivel',
+  'impacto', 'salto', 'vitoria'];
 
 export default class Sons {
   constructor(scene) {

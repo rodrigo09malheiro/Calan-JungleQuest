@@ -39,8 +39,9 @@ export default class Metricas {
     const tempoPorSala = t.salasLimpas > 0 ? t.tempoCombate / t.salasLimpas : 30;
 
     // Agressivo: limpa salas depressa. Cauteloso: demora mais, apanha tesouros, leva pouco dano.
+    // A variante é a chave usada em BOSS (config.js): 'tanque' ou 'agil'.
     const agressivo = tempoPorSala < 12;
-    const variante = agressivo ? 'TANQUE' : 'ÁGIL';
+    const variante = agressivo ? 'tanque' : 'agil';
 
     // Fator: começa em 1 e sobe quando o jogador está a jogar bem.
     let fator = 1;
