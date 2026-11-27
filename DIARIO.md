@@ -251,7 +251,7 @@
   - Joguei várias vezes, percebi que nunca chegava ao boss e escolhi quais das propostas aplicar.
 
 ### Sessão 8 (continuação) — versão para telemóvel
-**Objetivo:** poder jogar no telemóvel, com comandos táteis que só aparecem em ecrãs táteis (no PC fica tudo igual).
+**Objetivo:** adaptar o jogo ao telemóvel, como pede o enunciado, com comandos táteis que só aparecem em ecrãs táteis (no PC fica tudo igual).
 
 **Atividades realizadas:**
 - `sistemas/Toque.js`: deteta se o ecrã é tátil (ponteiro principal "grosso", ou seja, o dedo) e guarda o estado dos comandos (joystick e botões). Atalhos de teste: `?toque=1` força os comandos no PC; `?toque=0` desliga-os.
