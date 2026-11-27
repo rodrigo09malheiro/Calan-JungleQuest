@@ -18,7 +18,7 @@ export default class CalanLateral extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     // Origem nos pés; a hitbox é o corpo inteiro (na vista lateral a cabeça também conta).
-    this.setOrigin(0.5, PES_CALAN / ALTURA_CALAN);   // pés na linha 34 da célula de 34x46
+    this.setOrigin(0.5, PES_CALAN / ALTURA_CALAN);   // pés na linha 35 da célula de 48x48
     const larg = 12, alt = 24;
     this.body.setSize(larg, alt);
     this.body.setOffset((FRAME_CALAN - larg) / 2, PES_CALAN - alt);

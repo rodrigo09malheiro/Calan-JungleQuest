@@ -189,6 +189,24 @@
   - Desenhei os frames de ataque com espada, juntei-os num só ficheiro do Piskel com os frames antigos e pedi que a folha do Calan viesse desse ficheiro.
   - Gravei vídeos dos bugs que encontrei ao testar.
 
+### Sessão 8 (continuação) — Calan redesenhado com os golpes
+**Objetivo:** acabar com os ajustes ao arco do golpe no código.
+
+**Atividades realizadas:**
+- Redesenhei o Calan no Piskel (`calan_vfinal3.piskel`) em células de 48x48, com os pés sempre na linha 35 e o corpo centrado. Os golpes já trazem o arco desenhado: murro (preparar 9-11, golpe 12-14) e espada (16-18), de frente, de lado e de costas.
+- O `montar_calan.py` ficou mais simples: lê o tamanho das células do próprio `.piskel` e copia os frames para uma grelha, sem ajustes.
+- Saiu do código o arco desenhado à parte (`ARCO` e os centros dos arcos de `efeitos_calan.png`). O código só trata da zona de dano (`ARMAS` em `config.js`).
+
+**Decisões:**
+- Desenhar o arco nos frames em vez de o posicionar no código: a posição é a do desenho e não há números para acertar.
+- Mínimo de frames por direção: 1 parado, 2 a andar, e os golpes (2 no murro, 1 na espada).
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: verificar o novo Piskel (pés, centro, espaço na célula), adaptar o script e o código e testar no XAMPP.
+- O que alterei/validei:
+  - Redesenhei todos os frames do Calan com os golpes incluídos, depois de perguntar se isso resolvia os problemas do arco.
+
 ---
 
 # Declaração de utilização de IA

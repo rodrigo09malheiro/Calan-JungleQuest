@@ -16,7 +16,7 @@ export default class Calan extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     // A origem fica nos PÉS: a posição (x, y) é onde o Calan pisa o chão.
-    // Os pés estão na linha PES_CALAN da célula (por baixo há espaço para a espada).
+    // Os pés estão na linha PES_CALAN da célula (à volta há espaço para a espada e o arco).
     this.setOrigin(0.5, PES_CALAN / ALTURA_CALAN);
 
     // Hitbox pequena junto aos pés (12x8), para o corpo poder "passar por trás" das paredes de cima.

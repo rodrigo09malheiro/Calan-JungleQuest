@@ -1,4 +1,4 @@
-import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, ARCO, CENTRO_CALAN } from '../config.js';
+import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, CENTRO_CALAN } from '../config.js';
 import Aleatorio from '../sistemas/Aleatorio.js';
 import Calan from '../entities/Calan.js';
 import Slime from '../entities/Slime.js';
@@ -207,6 +207,7 @@ export default class GameScene extends Phaser.Scene {
   // ---------- Combate ----------
   // Chamado pelo evento 'calan-ataca' (emitido em Calan.atacar()).
   // O alcance, a zona e o dano dependem da arma: mãos ou espada (ARMAS em config.js).
+  // O desenho do golpe (com o arco) está nos frames de ataque do Calan; aqui só se trata do dano.
   golpe(calan) {
     this.sons.tocar('golpe');
     const arma = this.partida.arma;
@@ -215,15 +216,6 @@ export default class GameScene extends Phaser.Scene {
     const meioY = calan.y - CENTRO_CALAN;
     const cx = calan.x + d.x * arma.alcance;
     const cy = meioY + d.y * arma.alcance;
-
-    // Efeito visual: o arco da arma (pequeno com as mãos, grande com a espada), rodado para a direção do golpe.
-    const angulo = d.x > 0 ? 0 : d.x < 0 ? 180 : d.y > 0 ? 90 : -90;
-    // A origem do arco é o centro do próprio desenho, por isso fica centrado no meio do Calan.
-    const dist = arma.alcance + ARCO.afastar;
-    const [ox, oy] = ARCO.centros[arma.arco];
-    const arco = this.add.image(calan.x + d.x * dist, meioY + d.y * dist, 'efeitos_calan', arma.arco)
-      .setOrigin(ox / 32, oy / 32).setAngle(angulo).setDepth(calan.y + 1);
-    this.tweens.add({ targets: arco, alpha: 0, duration: 200, onComplete: () => arco.destroy() });
 
     // Zona de dano: quadrado à frente do Calan. Cada inimigo só leva 1 golpe por ataque.
     // Só contam os corpos do grupo dos inimigos: a zona também toca no próprio Calan

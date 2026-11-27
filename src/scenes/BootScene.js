@@ -13,9 +13,9 @@ export default class BootScene extends Phaser.Scene {
   constructor() { super('Boot'); }
 
   preload() {
-    // Folha do Calan: grelha 4x5 de células 34x46 (frames 0 a 18, linha a linha).
+    // Folha do Calan: grelha 4x5 de células 48x48 (frames 0 a 18, linha a linha).
     this.load.spritesheet('calan', asset('calan.png'), { frameWidth: FRAME_CALAN, frameHeight: ALTURA_CALAN });
-    // Efeitos: 0 espada, 1 arco pequeno, 2 e 3 arcos do golpe.
+    // Efeitos: 0 espada (usada no baú e no HUD), 1 a 3 arcos antigos (já não usados).
     this.load.spritesheet('efeitos_calan', asset('efeitos_calan.png'), { frameWidth: 32, frameHeight: 32 });
     // Slime: 0 redondo, 1 achatado, 2 muito achatado, 3 esticado (salto).
     this.load.spritesheet('slime', asset('slime.png'), { frameWidth: 30, frameHeight: 24 });
@@ -41,7 +41,8 @@ export default class BootScene extends Phaser.Scene {
     // Calan. Mapa dos frames (começam em 0):
     //   parado: 0 frente, 1 lado, 2 costas
     //   andar 1: 3, 4, 5      andar 2: 6, 7, 8
-    //   murro (sem espada): 9, 10, 11 -> 12, 13, 14      ataque com espada: 16, 17, 18
+    //   murro (sem espada): preparar 9, 10, 11 -> golpe 12, 13, 14      espada: 16, 17, 18
+    //   (os golpes 12-14 e 16-18 já trazem o arco desenhado)
     // O ciclo de andar usa o "parado" como frame de passagem: andar1, parado, andar2, parado.
     const anda = (chave, a, p, b) =>
       this.anims.create({

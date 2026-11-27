@@ -1,6 +1,6 @@
 import {
   TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA,
-  VIDA_CALAN, TILES_CRIPTA, GRAVIDADE, CHAO_Y, BOSS, ARCO, CENTRO_CALAN,
+  VIDA_CALAN, TILES_CRIPTA, GRAVIDADE, CHAO_Y, BOSS, CENTRO_CALAN,
 } from '../config.js';
 import Aleatorio from '../sistemas/Aleatorio.js';
 import GeradorArena from '../sistemas/GeradorArena.js';
@@ -162,19 +162,13 @@ export default class BossScene extends Phaser.Scene {
   }
 
   // ---------- Combate ----------
-  // Golpe do Calan: arco da arma à frente e zona de dano (como nas salas).
+  // Golpe do Calan: zona de dano à frente (como nas salas). O arco vem desenhado nos frames do Calan.
   golpe(calan) {
     this.sons.tocar('golpe');
     const arma = this.partida.arma;
     const lado = calan.olhaEsquerda ? -1 : 1;
     const cx = calan.x + lado * arma.alcance;
     const cy = calan.y - CENTRO_CALAN;   // meio do corpo
-    // Arco centrado no meio do Calan (origem no centro do próprio desenho).
-    const arcoX = calan.x + lado * (arma.alcance + ARCO.afastar);
-    const [ox, oy] = ARCO.centros[arma.arco];
-    const arco = this.add.image(arcoX, cy, 'efeitos_calan', arma.arco)
-      .setOrigin(ox / 32, oy / 32).setAngle(lado > 0 ? 0 : 180).setDepth(110);
-    this.tweens.add({ targets: arco, alpha: 0, duration: 200, onComplete: () => arco.destroy() });
 
     const t = arma.tamanho;
     let acertou = false;
