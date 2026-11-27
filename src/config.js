@@ -26,7 +26,7 @@ export const VIDA_CALAN = 6;       // vida máxima (corações)
 //  dano: vida que tira por golpe     alcance: distância do centro da zona de dano ao meio do Calan
 //  tamanho: lado da zona de dano (quadrado)
 export const ARMAS = {
-  maos:   { nome: 'mãos',   dano: 1, alcance: 5,  tamanho: 14 },
+  maos:   { nome: 'mãos',   dano: 1, alcance: 8,  tamanho: 14 },
   espada: { nome: 'espada', dano: 2, alcance: 15, tamanho: 24 },
 };
 
