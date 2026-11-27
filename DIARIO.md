@@ -260,6 +260,8 @@
 - Menu e Game Over: no telemóvel as instruções falam dos comandos táteis e joga-se a tocar no ecrã (no Game Over há dois botões). O jogo tenta abrir em ecrã inteiro e na horizontal.
 - `index.html`: sem zoom nem scroll ao tocar no jogo e, com o telemóvel na vertical, um aviso para o rodar.
 - Testado no browser em modo PC (sem comandos) e a imitar um telemóvel na horizontal (joystick, ataque e salto) e na vertical (aviso).
+- Publiquei uma versão de teste numa página privada para jogar no meu telemóvel; foi assim que encontrei o bug do inimigo a atravessar a parede (ver abaixo).
+- Passei a trabalhar com pull requests no GitHub: as alterações ficam num ramo à parte e só entram no `main` depois do merge (PR #1: versão para telemóvel; PR #2: correção das paredes).
 
 **Decisões:**
 - Os comandos táteis ficam numa cena à parte, aberta pelo HUD: o resto do jogo não muda e no PC esta cena nunca abre.
@@ -270,6 +272,8 @@
 - Finalidade: código dos comandos táteis, adaptação do menu e do ecrã de resultados e testes a imitar um telemóvel.
 - O que alterei/validei:
   - Pedi a versão para telemóvel com joystick e botões só quando são precisos, sem mudar nada no PC.
+  - Joguei no meu telemóvel (nível 2 com a espada) para validar os comandos táteis.
+  - Dei acesso ao repositório (app Claude no GitHub) e pedi os pull requests e os merges.
 
 ### Sessão 8 (continuação) — bug: inimigo a atravessar a parede
 **Problema:** a jogar no telemóvel, um olho de chamas saiu da sala pela parede de baixo (tirei uma captura de ecrã).
@@ -301,10 +305,10 @@
 | Interface | `HUDScene`, ecrã de resultados, recordes em `localStorage` | Usado |
 | Som | Script `ferramentas/gerar_sons.py`, que gera os efeitos em WAV | Usado |
 | Cenário | Escolha dos tiles do pack Pixel Crawler e script `ferramentas/montar_tileset.py` | Usado (o pack está creditado em `CREDITS.md`) |
-| Depuração | Diagnóstico do jogo a congelar ao mudar de sala (grupos reutilizados no `scene.restart()`) | Correção aplicada |
+| Depuração | Diagnóstico do jogo a congelar ao mudar de sala (grupos reutilizados no `scene.restart()`); inimigos a atravessar paredes (`OVERLAP_BIAS` do Arcade) | Correções aplicadas |
 | Boss e dificuldade adaptativa | Proposta da arena, `BossScene`, `Boss`, `CalanLateral`, `GeradorArena` e ligação das métricas ao boss | Usado |
 | Espada | Armas na configuração, espada no baú do nível 1, ícone no HUD e adaptação do boss à arma (a ideia foi minha) | Usado |
-| Telemóvel | `Toque.js`, `ToqueScene` (joystick e botões táteis), adaptação do menu, do Game Over e do `index.html` | Usado |
+| Telemóvel | `Toque.js`, `ToqueScene` (joystick e botões táteis), adaptação do menu, do Game Over e do `index.html` | Usado; testado por mim no telemóvel |
 | Documentação | Comentários no código, README e organização deste diário | Usado |
 
 **Decisões e alterações feitas por mim:**
@@ -314,5 +318,6 @@
 - Escolhi os inimigos (slime e olho de chamas) e o pack de cenário (Pixel Crawler).
 - Escolhi a versão sem Vite, para trabalhar com as ferramentas das aulas.
 - Decidi a ordem do trabalho: geração procedimental e combate primeiro, boss depois.
+- Pedi a versão para telemóvel (comandos táteis só em ecrãs táteis) e testei-a no meu telemóvel, onde encontrei o bug das paredes.
 
 **Compreensão do código:** todo o código entregue é considerado meu para efeitos de avaliação. <preencher: confirmar que percebeste as partes principais, por exemplo o gerador de níveis e o orçamento, e que as consegues explicar e modificar na defesa>
