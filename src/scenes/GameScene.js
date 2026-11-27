@@ -145,6 +145,13 @@ export default class GameScene extends Phaser.Scene {
     this.coracoes = this.physics.add.staticGroup();   // corações deixados pelos inimigos
     this.bau = null;
     this.escada = null;
+
+    // Limites do mundo = interior da sala (sem a parede de 1 tile à volta). Os inimigos ficam
+    // presos a estes limites: é uma rede de segurança para quando um empurrão (golpe do Calan,
+    // outro inimigo) os enterra numa parede mais do que o Arcade consegue corrigir; nesse caso
+    // o collider desiste de os separar e eles atravessavam a parede.
+    this.physics.world.setBounds(TILE, TILE, (SALA_LARGURA - 2) * TILE, (SALA_ALTURA - 2) * TILE);
+
     if (this.sala.limpa) return;
     for (const def of this.sala.inimigos) {
       const Classe = CLASSES_INIMIGO[def.tipo];
@@ -152,6 +159,7 @@ export default class GameScene extends Phaser.Scene {
       const x = def.tx * TILE + TILE / 2, y = def.ty * TILE + TILE;
       const inimigo = new Classe(this, x, y, this.cfg);   // o nível define velocidade e vida
       this.inimigos.add(inimigo);
+      inimigo.setCollideWorldBounds(true);   // nunca sai do interior da sala (ver setBounds acima)
     }
   }
 
