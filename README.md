@@ -30,6 +30,10 @@ Com o servidor do Python, se mudares o código e o jogo continuar igual, recarre
 - Boss (vista lateral): setas/A-D para andar, CIMA ou W para saltar, ESPAÇO ou J para atacar.
 - ESC volta ao menu.
 
+## Vida
+- O Calan tem 6 corações. Ao passar para o nível 2, a vida volta ao máximo.
+- Cada inimigo derrotado pode deixar um coração (+1 vida), que fica no chão 8 segundos: 12% de probabilidade sem espada e 8% com a espada. Com a vida cheia, vale pontos. Valores em `CORACAO`, no `src/config.js`.
+
 ## Baús
 - A sala do tesouro de cada nível tem um baú (+500 pontos e +1 coração; no nível 1 guarda também a espada).
 - Os outros becos sem saída têm 50% de probabilidade de esconder um baú extra: moedas (+200) ou, mais raramente, uma poção (+1 coração). Os valores estão em `BAUS_EXTRA`, no `src/config.js`.

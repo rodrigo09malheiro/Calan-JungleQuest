@@ -85,6 +85,15 @@ export default class BootScene extends Phaser.Scene {
     g.generateTexture('bola_fogo', 8, 8);
     g.clear();
 
+    // Coração 9x8 (deixado pelos inimigos): vermelho com contorno escuro e um brilho.
+    g.fillStyle(0x3a0d12).fillRect(1, 0, 3, 1).fillRect(5, 0, 3, 1).fillRect(0, 1, 9, 4)
+      .fillRect(1, 5, 7, 1).fillRect(2, 6, 5, 1).fillRect(3, 7, 3, 1);
+    g.fillStyle(0xe0414f).fillRect(1, 1, 3, 1).fillRect(5, 1, 3, 1).fillRect(1, 2, 7, 3)
+      .fillRect(2, 5, 5, 1).fillRect(3, 6, 3, 1);
+    g.fillStyle(0xffb3ba).fillRect(2, 2, 1, 1);
+    g.generateTexture('coracao', 9, 8);
+    g.clear();
+
     // Baú 16x14.
     g.fillStyle(0x2a1a0e).fillRect(0, 2, 16, 12);
     g.fillStyle(0x8a5a2b).fillRect(1, 3, 14, 10);

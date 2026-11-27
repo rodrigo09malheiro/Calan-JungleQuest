@@ -226,6 +226,30 @@
 - O que alterei/validei:
   - As ideias (mais baús nos becos sem saída, ícone a sair do baú, mais vida no nível 2) foram minhas; pedi para procurar os ícones no pack.
 
+### Sessão 8 (continuação) — jogo menos difícil
+**Objetivo:** depois de várias tentativas, nunca cheguei ao boss; o jogo estava difícil demais.
+
+**Atividades realizadas:**
+- A vida volta ao máximo ao passar para o nível 2 (`Partida.iniciarNivel`), com a mensagem "Vida recuperada".
+- Cada inimigo derrotado pode deixar um coração (+1 vida), com a semente da partida (`rngJogo`): 12% sem espada e 8% com a espada (comecei com 15% para todos). O coração fica no chão 8 segundos e pisca antes de desaparecer; com a vida cheia vale 50 pontos. Valores em `CORACAO` no `config.js`; o desenho do coração é feito por código na `BootScene`.
+- Aumentei o alcance do murro de 5 para 8 px.
+
+**Problemas:**
+- Os corações têm uma animação que repete para sempre; ao destruí-los, a animação continuava a apontar para um objeto que já não existia.
+
+**Solução:**
+- Antes de destruir um coração, paro as animações dele (`tweens.killTweensOf`).
+
+**Decisões:**
+- Das opções para facilitar (vida cheia no nível 2, corações dos inimigos, salas que se adaptam à vida, nível 2 mais leve), escolhi as duas primeiras.
+- Propus menos corações com a espada (10% sem / 5% com); pelas contas (8,3 inimigos no nível 1 e 16,9 no nível 2, em média), isso dava menos de 1 coração no nível 2 com espada. Escolhi o meio-termo 12% / 8% (~1,4 corações no nível 2 com espada). Assim as recompensas também se adaptam ao poder do jogador.
+
+### Uso de IA
+- Ferramenta: Claude (Anthropic), através do Claude Code.
+- Finalidade: análise da dificuldade, propostas para a reduzir, código e testes no XAMPP.
+- O que alterei/validei:
+  - Joguei várias vezes, percebi que nunca chegava ao boss e escolhi quais das propostas aplicar.
+
 ---
 
 # Declaração de utilização de IA

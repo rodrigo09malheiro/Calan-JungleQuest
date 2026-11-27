@@ -1,4 +1,4 @@
-import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, CENTRO_CALAN, BAUS_EXTRA, ICONE_MOEDA } from '../config.js';
+import { TILE, SCALE, SALA_LARGURA, SALA_ALTURA, HUD_ALTURA, ECRA_LARGURA, PORTAS, OPOSTA, VIDA_CALAN, TILES, CENTRO_CALAN, BAUS_EXTRA, ICONE_MOEDA, CORACAO } from '../config.js';
 import Aleatorio from '../sistemas/Aleatorio.js';
 import Calan from '../entities/Calan.js';
 import Slime from '../entities/Slime.js';
@@ -33,9 +33,14 @@ export default class GameScene extends Phaser.Scene {
     this.inicioSala = this.time.now;
     this.danoNestaSala = 0;
 
-    // Primeira visita à sala de entrada de um nível: mostra o nome do nível.
+    // Primeira visita à sala de entrada de um nível: mostra o nome do nível
+    // (e, a partir do nível 2, que a vida foi recuperada).
     if (this.sala.tipo === 'inicio' && !this.sala.visitada) {
-      this.partida.mensagem = { texto: `Nível ${this.partida.nivel + 1}: ${this.cfg.nome}`, ate: Date.now() + 2500 };
+      const nome = `Nível ${this.partida.nivel + 1}: ${this.cfg.nome}`;
+      this.partida.mensagem = {
+        linhas: this.partida.nivel > 0 ? [nome, 'Vida recuperada'] : [nome],
+        ate: Date.now() + 2500,
+      };
     }
     this.sala.visitada = true;
 
@@ -137,6 +142,7 @@ export default class GameScene extends Phaser.Scene {
     // grupos e objetos têm de ser criados de novo aqui (senão ficam os da sala anterior).
     this.inimigos = this.physics.add.group();
     this.projeteis = this.physics.add.group();
+    this.coracoes = this.physics.add.staticGroup();   // corações deixados pelos inimigos
     this.bau = null;
     this.escada = null;
     if (this.sala.limpa) return;
@@ -181,6 +187,8 @@ export default class GameScene extends Phaser.Scene {
   //  - collider: os corpos batem e não se atravessam (paredes, pedras, portas fechadas);
   //  - overlap: os corpos podem sobrepor-se e chama-se uma função (dano, mudar de sala).
   criarColisoes() {
+    // Apanhar um coração deixado por um inimigo.
+    this.physics.add.overlap(this.calan, this.coracoes, (calan, coracao) => this.apanharCoracao(coracao));
     this.physics.add.collider(this.calan, this.paredes);
     this.physics.add.collider(this.calan, this.portasFechadas);
     this.physics.add.collider(this.inimigos, this.paredes);
@@ -270,6 +278,9 @@ export default class GameScene extends Phaser.Scene {
     this.partida.somarPontos(inimigo.pontos);
     this.partida.metricas.inimigoDerrotado();
     this.textoFlutuante(inimigo.x, inimigo.y - 20, `+${inimigo.pontos}`, '#ffe08a');
+    // Às vezes deixa um coração (menos vezes se o Calan já tiver a espada).
+    const chance = this.partida.temEspada ? CORACAO.chanceComEspada : CORACAO.chanceSemEspada;
+    if (this.partida.rngJogo.chance(chance)) this.deixarCoracao(inimigo.x, inimigo.y);
 
     const vivos = this.inimigos.getChildren().filter((e) => !e.morto);
     if (vivos.length === 0) this.salaLimpa();
@@ -328,6 +339,37 @@ export default class GameScene extends Phaser.Scene {
       this.mostrarItem('itens', c.icone);
     }
     this.bau.destroy();
+  }
+
+  // Um coração fica no chão onde o inimigo morreu. Desaparece ao fim de CORACAO.duracao,
+  // a piscar nos últimos 2 segundos para avisar o jogador.
+  deixarCoracao(x, y) {
+    const coracao = this.coracoes.create(x, y - 4, 'coracao').setDepth(y);
+    this.tweens.add({ targets: coracao, y: y - 8, duration: 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    this.time.delayedCall(CORACAO.duracao - 2000, () => {
+      if (coracao.active) this.tweens.add({ targets: coracao, alpha: 0.2, duration: 120, yoyo: true, repeat: -1 });
+    });
+    this.time.delayedCall(CORACAO.duracao, () => this.removerCoracao(coracao));
+  }
+
+  // Tira o coração do jogo (pára primeiro as animações que repetem para sempre).
+  removerCoracao(coracao) {
+    if (!coracao.active) return;
+    this.tweens.killTweensOf(coracao);
+    coracao.destroy();
+  }
+
+  // O Calan apanhou um coração: +1 vida (ou pontos, se a vida já estiver cheia).
+  apanharCoracao(coracao) {
+    if (!coracao.active) return;
+    this.removerCoracao(coracao);
+    this.sons.tocar('tesouro');
+    if (this.curar(1)) {
+      this.textoFlutuante(this.calan.x, this.calan.y - 30, '+1 vida', '#9fffa8');
+    } else {
+      this.partida.somarPontos(CORACAO.pontosSeCheio);
+      this.textoFlutuante(this.calan.x, this.calan.y - 30, `+${CORACAO.pontosSeCheio}`, '#ffd34d');
+    }
   }
 
   // Recupera vida sem passar do máximo. Devolve false se a vida já estava cheia.

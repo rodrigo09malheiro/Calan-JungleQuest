@@ -91,6 +91,18 @@ export const BAUS_EXTRA = {
 };
 export const ICONE_MOEDA = 0;      // ícone mostrado pelo baú da sala do tesouro (pontos)
 
+// Corações deixados pelos inimigos derrotados.
+//  chanceSemEspada / chanceComEspada: probabilidade de cada inimigo deixar um coração
+//    (com a semente da partida). Com a espada o Calan é mais forte, por isso recebe menos ajuda.
+//  duracao: ms que o coração fica no chão (pisca nos últimos 2 s)
+//  pontosSeCheio: pontos que dá se o Calan já tiver a vida cheia
+export const CORACAO = {
+  chanceSemEspada: 0.12,
+  chanceComEspada: 0.08,
+  duracao: 8000,
+  pontosSeCheio: 50,
+};
+
 // Tileset do cenário (assets/cenario/tiles.png, montado por ferramentas/montar_tileset.py
 // a partir do pack Pixel Crawler). Cada linha da folha tem 8 tiles de 16x16.
 // Para cada tipo: o primeiro frame e quantas variações há.

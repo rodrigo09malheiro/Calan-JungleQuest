@@ -16,6 +16,8 @@ export default class Partida {
     this.boss = null;           // estado do boss para o HUD (só durante a luta)
     this.bossDerrotado = false;
     this.temEspada = false;     // passa a true ao abrir o baú do nível 1
+    // Aleatoriedade durante o jogo (ex.: corações deixados pelos inimigos), também com a semente.
+    this.rngJogo = new Aleatorio(semente * 17 + 3);
     this.nivel = 0;
     this.iniciarNivel(0);
   }
@@ -50,8 +52,10 @@ export default class Partida {
   get arma() { return this.temEspada ? ARMAS.espada : ARMAS.maos; }   // arma em uso
 
   // Gera o mapa do nível n e põe o Calan na sala de entrada.
+  // A partir do nível 2, a vida volta ao máximo (o nível 2 não começa com o Calan já gasto).
   iniciarNivel(n) {
     this.nivel = n;
+    if (n > 0) this.vida = VIDA_CALAN;
     // Cada nível tem o seu próprio gerador, derivado da semente da partida,
     // para o nível 2 não depender de quantos números o nível 1 consumiu.
     const rngNivel = new Aleatorio(this.semente * 31 + n * 7919);
